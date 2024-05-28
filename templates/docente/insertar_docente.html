@@ -1,10 +1,10 @@
 <!-- templates/index.html -->
 {% extends "index.html" %}
 {% block title %}Subir y Visualizar Docentes{% endblock %}
-{% block content %}
+{% block bloque %}
 <h2>Subir archivo XML de Docentes</h2>
 <form method="POST" action="/insertar" enctype="multipart/form-data">
-    <input type="file" name="file" accept=".xml, .xlsx">
+    <input type="file" name="file" accept=".xml, .xlsx, .csv">
     <button type="submit" class="btn btn-primary">Subir</button>
 </form>
 
