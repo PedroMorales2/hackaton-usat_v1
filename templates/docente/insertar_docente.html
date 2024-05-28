@@ -1,0 +1,42 @@
+<!-- templates/index.html -->
+{% extends "index.html" %}
+{% block title %}Subir y Visualizar Docentes{% endblock %}
+{% block content %}
+<h2>Subir archivo XML de Docentes</h2>
+<form method="POST" action="/insertar" enctype="multipart/form-data">
+    <input type="file" name="file" accept=".xml, .xlsx">
+    <button type="submit" class="btn btn-primary">Subir</button>
+</form>
+
+{% if docentes %}
+<h2>Datos de los Docentes</h2>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Semestre</th>
+            <th>Nombre</th>
+            <th>Apellido</th>
+            <th>Correo</th>
+            <th>Dedicación</th>
+            <th>Teléfono</th>
+            <th>Hora de Asesoría</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for docente in docentes %}
+        <tr>
+            <td>{{ docente.semestre_id }}</td>
+            <td>{{ docente.nombre }}</td>
+            <td>{{ docente.apellido }}</td>
+            <td>{{ docente.correo }}</td>
+            <td>{{ docente.dedicacion }}</td>
+            <td>{{ docente.telefono }}</td>
+            <td>{{ docente.hora_asesoria }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<p>No hay datos para mostrar. Por favor, sube un archivo XML.</p>
+{% endif %}
+{% endblock %} 
