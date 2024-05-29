@@ -1,8 +1,8 @@
 from flask import Flask, render_template, request, redirect, url_for, flash, session
 import xml.etree.ElementTree as ET
 import pandas as pd
-# import controladores.semestre as sem
-# import controladores.docentes as doc
+import controladores.semestre as sem
+import controladores.docentes as doc
 app = Flask(__name__)
 
 @app.route('/')
@@ -56,9 +56,19 @@ def index():
 #     return redirect(url_for('listarDocente'))
 
 
+docentes = []
+
+def find_start_row(df, columns):
+    """Encuentra la fila inicial donde todas las columnas especificadas están presentes, considerando múltiples posibles nombres."""
+    for index, row in df.iterrows():
+        if all(any(col.lower() in str(x).lower() for x in row.values) for col in columns):
+            return index
+    return None
+
+
 @app.route('/insertar', methods=['GET', 'POST'])
 def upload_and_display():
-    docentes = []
+    global docentes  
     if request.method == 'POST':
         file = request.files['file']
         if file:
@@ -66,27 +76,64 @@ def upload_and_display():
                 if file.filename.endswith('.xml'):
                     tree = ET.parse(file)
                     root = tree.getroot()
-                    docentes = [{
-                        'semestre_id': docente.find('semestre').text,
-                        'nombre': docente.find('nombre').text,
-                        'apellido': docente.find('apellido').text,
-                        'correo': docente.find('correo').text,
-                        'dedicacion': docente.find('dedicacion').text,
-                        'telefono': docente.find('telefono').text,
-                        'hora_asesoria': docente.find('hora_asesoria').text
-                    } for docente in root.findall('.//docente')]
-                elif file.filename.endswith('.xlsx'):
-                    df = pd.read_excel(file)
-                    docentes = df.to_dict(orient='records')
-                elif file.filename.endswith('.csv'):
-                    df = pd.read_csv(file)
-                    docentes = df.to_dict(orient='records')
+                    for docente in root.findall('.//docente'):
+                        data = {}
+                        fields = ['semestre', 'nombre', 'apellido', 'correo', 'dedicacion', 'telefono']
+                        for field in fields:
+                            element = docente.find(field)
+                            if element is not None:
+                                data[field] = element.text
+                            else:
+                                data[field] = 'No especificado'
+                        docentes.append(data)
+                
+                elif file.filename.endswith(('.xlsx', '.csv')):
+                    if file.filename.endswith('.xlsx'):
+                        df = pd.read_excel(file, header=None)
+                    else:
+                        df = pd.read_csv(file, header=None)
+                    
+                    expected_columns = ['semestre', 'nombre', 'apellido', 'correo', 'dedicacion', 'telefono']
+                    start_row = find_start_row(df, expected_columns)
+                    if start_row is not None:
+                        df.columns = df.iloc[start_row].apply(lambda x: x.lower() if isinstance(x, str) else x)
+                        df = df[start_row+1:]
+                        df = df.loc[:, df.columns.isin(expected_columns)].copy()  # Filtramos solo las columnas esperadas
+                        docentes = df.to_dict(orient='records')
+                    else:
+                        missing_columns = [col for col in expected_columns if col not in df.columns]
+                        return f"Error: Faltan las siguientes columnas en el archivo: {', '.join(missing_columns)}"
+                                         
     return render_template('docente/insertar_docente.html', docentes=docentes)
 
+@app.route('/update_docente', methods=['POST'])
+def update_docente():
+    index = int(request.form['index'])
+    docentes[index]['nombre'] = request.form['nombre']
+    docentes[index]['apellido'] = request.form['apellido']
+    docentes[index]['correo'] = request.form['correo']
+    docentes[index]['dedicacion'] = request.form['dedicacion']
+    docentes[index]['telefono'] = request.form['telefono']
+    return redirect(url_for('upload_and_display'))
+
+# insertar docente en la base de datos desde la tabla
 
 
-            
-             
+@app.route('/insertar_docentes', methods=['POST'])
+def insertar_docentes():
+    nombres = request.form.getlist('nombre[]')
+    apellidos = request.form.getlist('apellido[]')
+    correos = request.form.getlist('correo[]')
+    dedicaciones = request.form.getlist('dedicacion[]')
+    telefonos = request.form.getlist('telefono[]')
+    
+    for i in range(len(nombres)):
+        doc.insertarDocente(nombres[i], apellidos[i], correos[i], dedicaciones[i], telefonos[i])
+    
+    return redirect(url_for('upload_and_display'))  
+
+
+
 
 if __name__ == '__main__':
-    app.run( debug=True, use_reloader=True)
+    app.run( debug=True)

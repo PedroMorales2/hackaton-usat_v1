@@ -1,4 +1,4 @@
-from bd import conexion
+from controladores.bd import conexion
 
 con = conexion()
 
