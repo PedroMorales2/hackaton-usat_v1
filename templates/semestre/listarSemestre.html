@@ -5,40 +5,39 @@
 {% block bloque %}
 
 <div class="container">
+
+    <a href="/agregar_semestre" class="btn btn-primary">AGREGAR</a>
     <div class="row">
         <div class="col-12">
             <h1 class="text-center">Listar Semestre</h1>
         </div>
     </div>
+
     <div class="row">
         <div class="col-12">
             <table class="table">
                 <thead>
                     <tr>
-                        <th scope="col">ID</th>
-                        <th scope="col">Nombre</th>
-                        <th scope="col">Fecha Inicio</th>
-                        <th scope="col">Fecha Fin</th>
-                        <th scope="col">Vigencia</th>
-                        <th scope="col">Acciones</th>
+                        <th>Nombre</th>
+                        <th>Fecha Inicio</th>
+                        <th>Fecha Fin</th>
+                        <th>Vigencia</th>
                     </tr>
                 </thead>
                 <tbody>
-                    {% for semestre in semestres %}
-                    <tr>
-                        <th scope="row">{{ semestre.id }}</th>
-                        <td>{{ semestre.nombre }}</td>
+                    {% for semestre in semestre %}
+                    <tr class="clickable-row" data-id="{{ semestre.id_semestre }}">
+                        <td>{{ semestre.nom_semestre }}</td>
                         <td>{{ semestre.fecha_inicio }}</td>
                         <td>{{ semestre.fecha_fin }}</td>
                         <td>{{ semestre.vigencia }}</td>
-                        <td>
-                            <a href="{{ url_for('editarSemestre', id=semestre.id) }}" class="btn btn-warning">Editar</a>
-                            <a href="{{ url_for('eliminarSemestre', id=semestre.id) }}" class="btn btn-danger">Eliminar</a>
-                        </td>
+                        
                     </tr>
                     {% endfor %}
                 </tbody>
             </table>
+            
+            
         </div>
     </div>
 

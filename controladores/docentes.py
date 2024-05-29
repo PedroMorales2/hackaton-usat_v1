@@ -8,14 +8,25 @@ def listar():
         cursor.execute('SELECT * FROM docentes')
         return cursor.fetchall()
     
-def insertarDocente(nombre, apellido, correo, dedicacion,telefono):
-    con = conexion()
+import pymysql
+
+def insertarDocente(semestre, nombre, apellido, correo, dedicacion, telefono, horas_asesoria):
+    con = conexion()  # Asume que esta función correctamente configura y devuelve una conexión a la base de datos
     try:
         with con.cursor() as cursor:
-            cursor.execute('INSERT INTO docentes (nombre, apellido, correo, dedicacion, telefono) VALUES (%s, %s, %s, %s, %s)', 
-                           (nombre, apellido, correo, dedicacion, telefono))
+            cursor.callproc('insertar_docente', [semestre, nombre, apellido, correo, dedicacion, telefono, horas_asesoria])
             con.commit()
-    except Exception as e:
-        print("Error al insertar docente:", e)
-        con.rollback() 
-        
+    except pymysql.MySQLError as e:
+        print("Error al insertar el docente y vincularlo con el semestre:", e)
+        con.rollback()
+    finally:
+        con.close()
+
+
+
+
+
+
+
+    
+

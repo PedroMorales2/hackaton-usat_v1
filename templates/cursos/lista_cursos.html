@@ -1,0 +1,37 @@
+{% extends "index.html" %}
+
+{% block title %}Listar cursos{% endblock %}
+
+{% block bloque %}
+
+<div class="container">
+
+
+    <div class="row">
+        <div class="col-12">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th scope="col">Nombre</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for semestre in cursos %}
+                    <tr>
+                        <td>{{ semestre.nombre_curso }}</td>
+                        <td>
+                            <a href="/editar_cuso/{{ semestre.idCurso }}" class="btn btn-warning">Editar</a>
+                            <a href="/eliminar_curso/{{ semestre.idCurso }}" class="btn btn-danger">Eliminar</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+
+
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+
+{% endblock %}

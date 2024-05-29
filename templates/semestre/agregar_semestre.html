@@ -1,12 +1,9 @@
-
 {% extends "index.html" %}
-
-{% block title %}Editar Semestre{% endblock %}
-
+{% block title %}Agregar Semestre{% endblock %}
 {% block bloque %}
 
 <div>
-    <h1 class="text-center">Editar Semestre</h1>
+    <h1 class="text-center">Agregar Semestre</h1>
     {% with messages = get_flashed_messages(with_categories=true) %}
     {% if messages %}
         {% for category, message in messages %}
@@ -18,33 +15,25 @@
     <hr>
     <br>
     
-    {% if semestre %}
-
-    <form action="/actualizar_semestre/{{ semestre.id_semestre }}" method="post">
+    <form action="/guardar_semestre" method="POST">
         <div class="mb-3">
             <label for="nombre" class="form-label">Nombre</label>
-            <input type="text" class="form-control" id="nombre" name="nombre" value="{{ semestre.nom_semestre }}">
+            <input type="text" class="form-control" id="nombre" name="nombre">
         </div>
         <div class="mb-3">
             <label for="fecha_inicio" class="form-label">Fecha Inicio</label>
-            <input type="date" class="form-control" id="fecha_inicio" name="fecha_inicio" value="{{ semestre.fecha_inicio }}">
+            <input type="date" class="form-control" id="fecha_inicio" name="fecha_inicio">
         </div>
         <div class="mb-3">
             <label for="fecha_fin" class="form-label">Fecha Fin</label>
-            <input type="date" class="form-control" id="fecha_fin" name="fecha_fin" value="{{ semestre.fecha_fin }}">
+            <input type="date" class="form-control" id="fecha_fin" name="fecha_fin">
         </div>
         <div class="mb-3">
             <label for="vigencia" class="form-label">Vigencia</label>
-            <input type="text" class="form-control" id="vigencia" name="vigencia" value="{{ semestre.vigencia }}">
+            <input type="text" class="form-control" id="vigencia" name="vigencia">
         </div>
         <button type="submit" class="btn btn-primary">Guardar</button>
-        {% else %}
-        <div class="alert alert-danger" role="alert">
-            No se encontró el semestre
-        </div>
     </form>
-    {% endif %}
-
 </div>
 
 {% endblock %}

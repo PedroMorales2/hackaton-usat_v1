@@ -1,0 +1,11 @@
+.actions-row td {
+    background-color: #f8f9fa; 
+}
+
+.clickable-row {
+    cursor: pointer;
+}
+
+.clickable-row:hover {
+    background-color: #b26868; 
+}
