@@ -129,34 +129,35 @@ def update_docente():
     docentes[index]['hora_disponible'] = request.form['hora_disponible']
     return redirect(url_for('upload_and_display'))
 
-# insertar docente en la base de datos desde la tabla
 
+# insertar docente en la base de datos desde la tabla
 @app.route('/insertar_docente', methods=['POST'])
 def insertar_docente():
-    semestre = request.form['semestre[]']
-    nombre = request.form['nombre[]']
-    apellido = request.form['apellido[]']
-    correo = request.form['correo[]']
-    dedicacion = request.form['dedicacion[]']
-    telefono = request.form['telefono[]']
-    hora_disponible = request.form['hora_disponible[]']
-    for i in range(len(nombre)):
-        doc.insertarDocente(semestre, nombre, apellido, correo, dedicacion, telefono, hora_disponible)
+    semestre = request.form.getlist('semestre[]')
+    nombre = request.form.getlist('nombre[]')
+    apellido = request.form.getlist('apellido[]')
+    correo = request.form.getlist('correo[]')
+    dedicacion = request.form.getlist('dedicacion[]')
+    telefono = request.form.getlist('telefono[]')
+    horas_asesoria = request.form.getlist('hora_disponible[]')
+
+    for i in range(len(nombre)):  # Asumimos que todas las listas tienen la misma longitud
+        doc.insertarDocente(semestre[i], nombre[i], apellido[i], correo[i], dedicacion[i], telefono[i], horas_asesoria[i])
     return redirect(url_for('upload_and_display'))
 
 
 # @app.route('/insertar_docentes', methods=['POST'])
 # def insertar_docentes():
 #     semestre = request.form.getlist('semestre[]')
-#     nombres = request.form.getlist('nombre[]')
+#     nombre = request.form.getlist('nombre[]')
 #     apellidos = request.form.getlist('apellido[]')
 #     correos = request.form.getlist('correo[]')
 #     dedicaciones = request.form.getlist('dedicacion[]')
 #     telefonos = request.form.getlist('telefono[]')
 #     hora_disponible = request.form.getlist('hora_disponible[]')
     
-#     for i in range(len(nombres)):
-#         doc.insertarDocente(semestre[i],nombres[i], apellidos[i], correos[i], dedicaciones[i], telefonos[i],hora_disponible[i])
+#     for i in range(len(nombre)):
+#         doc.insertarDocente(semestre[i],nombre[i], apellidos[i], correos[i], dedicaciones[i], telefonos[i],hora_disponible[i])
     
 #     return redirect(url_for('upload_and_display'))  
 

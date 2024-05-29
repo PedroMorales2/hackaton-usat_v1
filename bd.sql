@@ -93,3 +93,44 @@ CREATE TABLE DOCENTE_SEMESTRE (
     FOREIGN KEY (id_semestre) REFERENCES semestre_academico(id_semestre),
     FOREIGN KEY (id_docentes) REFERENCES docentes(id_docentes)
 );
+
+
+
+
+
+DELIMITER $$
+
+CREATE PROCEDURE insertar_docente(
+    IN p_nom_semestre VARCHAR(50),
+    IN p_nombre VARCHAR(100),
+    IN p_apellido VARCHAR(100),
+    IN p_correo VARCHAR(100),
+    IN p_dedicacion VARCHAR(50),
+    IN p_telefono VARCHAR(20),
+    IN p_horas_asesoria INT
+)
+BEGIN
+    DECLARE v_id_semestre INT;
+    DECLARE v_id_docente INT;
+
+    -- Buscar el ID del semestre
+    SELECT id_semestre INTO v_id_semestre FROM semestre_academico WHERE nom_semestre = p_nom_semestre;
+    IF v_id_semestre IS NULL THEN 
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'El semestre proporcionado no existe.';
+    END IF;
+
+    -- Insertar el nuevo docente
+    INSERT INTO docentes (nombre, apellido, correo, dedicacion, telefono) 
+    VALUES (p_nombre, p_apellido, p_correo, p_dedicacion, p_telefono);
+    SET v_id_docente = LAST_INSERT_ID();
+
+    -- Vincular el docente con el semestre
+    INSERT INTO docente_semestre (id_docentes, id_semestre, horas_asesoria_semanal) 
+    VALUES (v_id_docente, v_id_semestre, p_horas_asesoria);
+
+    -- Commit la transacción
+    COMMIT;
+END$$
+
+DELIMITER ;
+

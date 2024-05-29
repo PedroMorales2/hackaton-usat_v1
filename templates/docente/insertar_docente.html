@@ -57,7 +57,7 @@
 
 {% for docente in docentes %}
 <div class="modal fade" id="editModal-{{ loop.index }}" tabindex="-1" role="dialog"
-    aria-labelledby="editModalLabel-{{ loop.index }}">
+    aria-labelledby="editModalLabel-{{ loop.index }}" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
@@ -67,45 +67,48 @@
                 </button>
             </div>
             <div class="modal-body">
-                <form method="post" action="{{ url_for('update_docente') }}">
-                    <input type="hidden" name="index" value="{{ loop.index0 }}">
-
+                <form action="/insertar" method="post">
+                    <input type="hidden" name="id" value="{{ docente.id }}">
                     <div class="form-group">
-                        <label>Semestre</label>
+                        <label for="semestre">Semestre</label>
                         <input type="text" class="form-control" name="semestre" value="{{ docente.semestre }}">
-                    <div class="form-group">
-                        <label>Nombre</label>
+                    </div>
+                    <div class="form-group ">
+                        <label for="nombre">Nombre</label>
                         <input type="text" class="form-control" name="nombre" value="{{ docente.nombre }}">
                     </div>
-                    <div class="form-group">
-                        <label>Apellido</label>
+                    <div class="form-group ">
+                        <label for="apellido">Apellido</label>
                         <input type="text" class="form-control" name="apellido" value="{{ docente.apellido }}">
                     </div>
-                    <div class="form-group">
-                        <label>Correo</label>
+                    <div class="form-group ">
+                        <label for="correo">Correo</label>
                         <input type="text" class="form-control" name="correo" value="{{ docente.correo }}">
                     </div>
-                    <div class="form-group">
-                        <label>Dedicación</label>
+                    <div class="form-group ">
+                        <label for="dedicacion">Dedicación</label>
                         <input type="text" class="form-control" name="dedicacion" value="{{ docente.dedicacion }}">
-                    </div>
-                    <div class="form-group">
-                        <label>Teléfono</label>
+                    </div> 
+                    <div class="form-group ">
+                        <label for="telefono">Teléfono</label>
                         <input type="text" class="form-control" name="telefono" value="{{ docente.telefono }}">
                     </div>
-                    <div class="form-group mb-0">
-                        <label>Horas Disponibles</label>
-                        <input type="text" class="form-control" name="hora_disponible"
-                            value="{{ docente.horas_disponibles }}">
+                    <div class="form-group ">
+                        <label for="hora_disponible">Horas Disponibles</label>
+                        <input type="text" class="form-control" name="hora_disponible" value="{{ docente.hora_disponible }}">
                     </div>
-                    <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+                    <button type="submit" class="btn btn-primary">Guardar</button> 
                 </form>
             </div>
+
         </div>
     </div>
 </div>
-
 {% endfor %}
+
+
+
+
 {% else %}
 <p>No hay datos para mostrar. Por favor, sube un archivo XML.</p>
 {% endif %}
