@@ -4,9 +4,15 @@ con = conexion()
 
 def listar():
     with con.cursor() as cursor:
-        cursor.execute('SELECT * FROM semestre_academico')
-        return cursor.fetchall()
-
+        try:
+            cursor.execute('SELECT * FROM semestre_academico')
+            return cursor.fetchall()
+        except Exception as e:
+            print("Error al listar semestres:", e)
+            return None
+        finally:
+            cursor.close()
+            
 def insertarSemestre(nombre, fecha_inicio, fecha_fin, vigencia):
     con = conexion()  
     try:
@@ -23,7 +29,7 @@ def insertarSemestre(nombre, fecha_inicio, fecha_fin, vigencia):
         con.rollback()
         return False
     finally:
-        con.close()  
+        cursor.close()  
 
 def eliminarSemestre(id):
     with con.cursor() as cursor:
@@ -38,7 +44,7 @@ def editarSemestre(id, nombre, fecha_inicio, fecha_fin, vigencia):
             if cursor.fetchone() is not None:
                 return False 
             cursor.execute('UPDATE semestre_academico SET nom_semestre = %s, fecha_inicio = %s, fecha_fin = %s, vigencia = %s WHERE id_semestre = %s', (nombre, fecha_inicio, fecha_fin, vigencia, id))
-            con.commit()
+            cursor.commit()
             return True
     except Exception as e:
         print("Error al actualizar semestre:", e)
@@ -57,3 +63,4 @@ def buscarSemestrePorNombre(nombre):
         cursor.execute('SELECT * FROM semestre_academico WHERE nombre = %s', (nombre))
         return cursor.fetchone()
     
+

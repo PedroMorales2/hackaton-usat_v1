@@ -1,0 +1,234 @@
+{% extends "index.html" %}
+
+{% block title %}Editar Semestre{% endblock %}
+
+{% block bloque %}
+
+<div class="container">
+
+    <div class="row">
+
+        <div class="col-12">
+
+            <h1 class="text-center">Listar Grupo</h1>
+
+        </div>
+
+    </div>
+
+    <div class="row">
+
+        <div class="col-12">
+
+            <table class="table">
+
+                <thead>
+
+                    <tr>
+
+                        <th>Denominacion</th>
+
+                        <th>Docente</th>
+
+                        <th>Curso</th>
+
+                        <th>Semestre</th>
+
+                        <th>Insertar Sustentacion</th>
+
+                        <th>Editar Curso</th>
+
+                    </tr>
+
+                </thead>
+
+                <tbody>
+
+                    {% for grupo in grupo %}
+
+                    <tr data-id="{{ grupo.idGrupo }}">
+
+                        <td>{{ grupo.denominacion }}</td>
+
+                        <td>{{ grupo.nom_docente }}</td>
+
+                        <td>{{ grupo.nombre_curso }}</td>
+
+                        <td>{{ grupo.nom_semestre }}</td>
+
+                        <td>
+                            <button type="button" class="btn btn-warning" data-toggle="modal"
+                                data-target="#editModal-{{ loop.index }}">
+                                Insertar
+                            </button>
+                        </td>
+
+                        <td>
+                            <button type="button" class="btn btn-success" data-toggle="modal"
+                                data-target="#insert-{{ loop.index }}">
+                                Editar
+                            </button>
+                        </td>
+
+                    </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+</div>
+
+
+
+
+{% for grupo in grupo %}
+<div class="modal fade" id="editModal-{{ loop.index }}" tabindex="-1" role="dialog"
+    aria-labelledby="editModalLabel-{{ loop.index }}">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editModalLabel-{{ loop.index }}">Editar GRUPO</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form method="post" action="/insertar_sustentacion_grupo">
+                    <input type="hidden" name="index" value="{{ loop.index0 }}">
+
+
+                    <input type="text" class="form-control" id="semestre" name="id_grupo" value="{{ grupo.idGrupo }}">
+
+
+                    <div class="form-group row">
+                        <label for="semestre" class="col-sm-2 col-form-label">Semestre</label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" id="semestre" name="semestre"
+                                value="{{ grupo.nom_semestre }}">
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label for="curso" class="col-sm-2 col-form-label">Curso</label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" id="curso" name="curso"
+                                value="{{ grupo.nombre_curso }}">
+                        </div>
+                    </div>
+
+                    <div class="form-group row">
+                        <label for="curso" class="col-sm-2 col-form-label">Tipo Sustentacion</label>
+                        <div class="col-sm-10">
+                            <select name="tiempo" id="">
+                                <option value="parcial">PARCIAL</option>
+                                <option value="final">FINAL</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group row">
+                        <label for="curso" class="col-sm-2 col-form-label">Semanas</label>
+                        <div class="col-sm-10">
+                            <input type="text" id="weekNumbers" class="form-control" name="weekNumbers"
+                                onchange="updateDatesBasedOnWeeks(this.value)" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group row">
+                        <label for="curso" class="col-sm-2 col-form-label">Desde</label>
+                        <div class="col-sm-10">
+                            <input type="date" id="startDate" class="form-control" name="startDate" readonly>
+                        </div>
+                    </div>
+
+                    <div class="form-group row">
+                        <label for="curso" class="col-sm-2 col-form-label">Hasta</label>
+                        <div class="col-sm-10">
+                            <input type="date" id="endDate" name="endDate" class="form-control" readonly>
+                        </div>
+                    </div>
+
+                    <div class="form-group row">
+                        <label for="curso" class="col-sm-2 col-form-label">Duracion min</label>
+                        <div class="col-sm-10">
+                            <input type="number" class="form-control" id="minutos" name="minutos" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group row">
+                        <label for="curso" class="col-sm-2 col-form-label">¿Compensara?</label>
+                        <div class="col-sm-10 x-2 ">
+                            <input type="checkbox" name="compensa" id="" value="1">
+                        </div>
+                    </div>
+
+
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+                    <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endfor %}
+
+
+
+
+{% for grupo in grupo %}
+<div class="modal fade" id="insert-{{ loop.index }}" tabindex="-1" role="dialog"
+    aria-labelledby="editModalLabel-{{ loop.index }}">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editModalLabel-{{ loop.index }}">Editar GRUPO</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form method="post" action="">
+                    <input type="hidden" name="index" value="{{ loop.index0 }}">
+                    <div class="form-group row">
+                        <label for="denominacion" class="col-sm-2 col-form-label">Denominacion</label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" id="denominacion" name="denominacion"
+                                value="{{ grupo.denominacion }}">
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label for="docente" class="col-sm-2 col-form-label">Docente</label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" id="docente" name="docente"
+                                value="{{ grupo.nom_docente }}">
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label for="curso" class="col-sm-2 col-form-label">Curso</label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" id="curso" name="curso"
+                                value="{{ grupo.nombre_curso }}">
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label for="semestre" class="col-sm-2 col-form-label">Semestre</label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" id="semestre" name="semestre"
+                                value="{{ grupo.nom_semestre }}">
+                        </div>
+                    </div>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+                    <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endfor %}
+
+
+{% endblock %}

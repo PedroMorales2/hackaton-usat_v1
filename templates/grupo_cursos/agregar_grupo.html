@@ -1,0 +1,33 @@
+{% extends "index.html" %}
+{% block title %}Subir y Visualizar Docentes{% endblock %}
+{% block bloque %}
+<form action="/agregar_grupito" method="post">
+    <div class="mb-3">
+        <label for="denominacion">Denominación del Grupo</label>
+        <input type="text" class="form-control" name="denominacion" id="denominacion" required>
+    </div>
+    <div class="mb-3">
+        <label for="id_docente">Seleccionar Docente</label>
+        <select class="form-select" name="id_docente" id="id_docente" required>
+            {% for docentes in docente %}
+            <option value="{{ docentes.id_docentes }}">{{ docentes.nombre }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="mb-3">
+        <label for="id_curso">Seleccionar Curso</label>
+        <select class="form-select" name="id_curso" id="id_curso" required>
+            {% for curso in cursos %}
+            <option value="{{ curso.idCurso }}">{{ curso.nombre_curso }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="mb-3">
+        <label for="semestre">Semestre</label>
+        <input type="text" value="{{ semestres.nom_semestre }}" class="form-control" name="semestre" id="semestre" required>
+    </div>
+    <button type="submit" class="btn btn-primary">Agregar Grupo</button>
+</form>
+
+
+{% endblock %}

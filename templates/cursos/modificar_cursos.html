@@ -1,0 +1,20 @@
+{% extends "index.html" %}
+
+{% block title %}Listar cursos{% endblock %}
+
+{% block bloque %}
+
+<div class="container">
+
+    <form action="/modificar_curso/{{ curso.idCurso }}" method="post">
+        <div class="form-group">
+            <label for="nombre_curso">Nombre del curso</label>
+            <input type="text" class="form-control" id="nombre_curso" name="nombre_curso"
+                value="{{ curso.nombre_curso }}" required>
+        </div>
+        <button type="submit" class="btn btn-primary">Guardar</button>
+        <a href="/curso" class="btn btn-primary">Volver</a>
+    </form>
+
+</div>
+{% endblock %}

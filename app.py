@@ -4,8 +4,11 @@ import pandas as pd
 import controladores.semestre as sem
 import controladores.docentes as doc
 import controladores.cursos as cur
+import controladores.grupo_horario as gru
+import controladores.sustentacion as sus
 app = Flask(__name__)
 
+app.secret_key = 'mysecret key'
 @app.route('/')
 def home():
     return render_template('principal.html')
@@ -133,16 +136,22 @@ def update_docente():
 # insertar docente en la base de datos desde la tabla
 @app.route('/insertar_docente', methods=['POST'])
 def insertar_docente():
-    semestre = request.form.getlist('semestre[]')
-    nombre = request.form.getlist('nombre[]')
-    apellido = request.form.getlist('apellido[]')
-    correo = request.form.getlist('correo[]')
-    dedicacion = request.form.getlist('dedicacion[]')
-    telefono = request.form.getlist('telefono[]')
-    horas_asesoria = request.form.getlist('hora_disponible[]')
+    try: 
+        semestre = request.form.getlist('semestre[]')
+        nombre = request.form.getlist('nombre[]')
+        apellido = request.form.getlist('apellido[]')
+        correo = request.form.getlist('correo[]')
+        dedicacion = request.form.getlist('dedicacion[]')
+        telefono = request.form.getlist('telefono[]')
+        horas_asesoria = request.form.getlist('hora_disponible[]')
 
-    for i in range(len(nombre)):  # Asumimos que todas las listas tienen la misma longitud
-        doc.insertarDocente(semestre[i], nombre[i], apellido[i], correo[i], dedicacion[i], telefono[i], horas_asesoria[i])
+        for i in range(len(nombre)):  # Asumimos que todas las listas tienen la misma longitud
+            doc.insertarDocente(semestre[i], nombre[i], apellido[i], correo[i], dedicacion[i], telefono[i], horas_asesoria[i])
+        global docentes
+        docentes = []
+        flash('Todos los docentes han sido insertados exitosamente.', 'success')
+    except Exception as e:
+        flash(f'Error al insertar docentes: {str(e)}', 'error')
     return redirect(url_for('upload_and_display'))
 
 
@@ -163,12 +172,103 @@ def insertar_docente():
 
 
 
-
+######CURSOS
 @app.route('/curso')
-def curso():
+def cursito():
     cursos = cur.listar()
     return render_template('cursos/lista_cursos.html', cursos = cursos)
 
+@app.route('/agregar_curso')
+def agregarCurso():
+    return render_template('cursos/agregar_cursos.html')
+
+@app.route('/guardar_curso', methods=['POST'])
+def guardar_curso():
+    nombre = request.form['nombre_curso']
+    cur.insertarCurso(nombre)
+    return redirect(url_for('cursito'))
+
+@app.route('/editar_curso/<int:id>')
+def editarCurso(id):
+    curso = cur.buscar(id)
+    return render_template('cursos/modificar_cursos.html', curso = curso)
+
+@app.route('/modificar_curso/<int:id>', methods=['POST'])
+def modificarCurso(id):
+    nombre = request.form['nombre_curso']
+    cur.actualizarCurso(id, nombre)
+    return redirect(url_for('cursito'))
+
+@app.route('/eliminar_curso/<int:id>')
+def eliminarCurso(id):
+    cur.eliminarCurso(id)
+    return redirect(url_for('cursito'))
+
+########## AGREGAR GRUPOS EN SEMESTRES
+@app.route('/agregar_grupos/<int:id>')
+def agregarGrupo(id):
+    semestres = sem.buscarSemestre(id)
+    cursos = cur.listar()
+    docente = doc.listar()
+    return render_template('grupo_cursos/agregar_grupo.html', semestres = semestres, cursos = cursos, docente = docente)
+
+# @app.route('/agregar_grupo_curso', methods=['POST'])
+# def agregarTdos():
+#     semestre = request.form['semestre']
+#     curso = request.form['curso']
+#     docente = request.form['docente']
+    
+#     cur.insertarGrupo(semestre, curso, docente)
+#     return redirect(url_for('listarSemestre'))
+
+# agregar desde el html con los input y los select
+
+@app.route('/agregar_grupito', methods=['POST'])
+def agregar_grupo_curso():
+    denominacion = request.form['denominacion']
+    id_docente = request.form['id_docente']
+    id_curso = request.form['id_curso']
+    semestre = request.form['semestre']
+    
+    resultado = gru.agregarGrupo(denominacion, semestre, id_docente,id_curso)
+    
+    if resultado:
+        flash('Grupo agregado exitosamente.')
+    else:
+        flash('Error al agregar el grupo.')
+
+
+    return redirect(url_for('listarGrupo'))
+    
+    
+# listar grupos
+@app.route('/listar_grupos')
+def listarGrupo():
+    grupo = gru.listar_grupo_docente()
+    return render_template('grupo_cursos/listar_grupo.html', grupo = grupo)
+
+
+@app.route('/insertar_sustentacion_grupo', methods=['POST'])
+def insertar_sustentacion_grupo():
+    # semestre = request.form['semestre']
+    # curso = request.form['curso']
+    tipo_sustentacion = request.form['tiempo']
+    semanas = request.form['weekNumbers']
+    inicio = request.form['startDate']
+    fin = request.form['endDate']
+    duracion = request.form['minutos']
+    # compensacion = request.form['compensa']
+    id_grupo = request.form['id_grupo']
+    com = 1 if 'compensa' in request.form else 0
+    sus.agregarSustentacion(tipo_sustentacion, semanas, inicio, fin, duracion, com, id_grupo)
+    # print(id_grupo, tipo_sustentacion, semanas, inicio, fin, duracion, com)
+    return redirect(url_for('sustentacionesGrupo'))
+
+######### sustentaciones
+@app.route('/sustentaciones_grupo')
+def sustentacionesGrupo():
+    sustentaciones = sus.listarSustentaciones()
+    return render_template('sustentacion/agregar.html', sustentaciones = sustentaciones)
 
 
 

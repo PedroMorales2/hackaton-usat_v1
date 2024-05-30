@@ -6,12 +6,13 @@ def listar():
     con = conexion()
     with con.cursor() as cursor:
         cursor.execute('SELECT * FROM docentes')
-        return cursor.fetchall()
+        lista = cursor.fetchall()
+        return lista
     
 import pymysql
 
 def insertarDocente(semestre, nombre, apellido, correo, dedicacion, telefono, horas_asesoria):
-    con = conexion()  # Asume que esta función correctamente configura y devuelve una conexión a la base de datos
+    con = conexion()  
     try:
         with con.cursor() as cursor:
             cursor.callproc('insertar_docente', (semestre, nombre, apellido, correo, dedicacion, telefono, horas_asesoria))

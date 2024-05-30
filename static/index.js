@@ -1,21 +1,52 @@
 $(document).ready(function() {
     $('.clickable-row').click(function() {
-        // Verifica si ya existe una fila de acciones debajo y la elimina si es así
         if ($(this).next().hasClass('actions-row')) {
             $(this).next().remove();
         } else {
-            // Remover cualquier otra fila de acciones abierta
             $('.actions-row').remove();
-            // Obtener el ID del semestre de la fila
             var semestreId = $(this).data('id');
-            // Crear la fila de acciones
             var actionsRow = '<tr class="actions-row"><td colspan="5">' +
                 '<a href="/editar_semestre/' + semestreId + '" class="btn btn-warning">Editar</a> ' +
                 '<a href="/eliminar_semestre/' + semestreId + '" class="btn btn-danger">Eliminar</a> ' +
-                '<a href="/agregar_cursos/' + semestreId + '" class="btn btn-info">Agregar Cursos</a>' +
+                '<a href="/agregar_grupos/' + semestreId + '" class="btn btn-info">Agregar Cursos</a>' +
                 '</td></tr>';
-            // Insertar la fila de acciones debajo de la fila clickeada
             $(this).after(actionsRow);
         }
     });
 });
+
+
+
+function updateDatesBasedOnWeeks(weekNumbers) {
+    const weeks = weekNumbers.split(',').map(Number).sort((a, b) => a - b);
+    if (weeks.length === 0 || isNaN(weeks[0])) {
+        alert("Por favor, ingrese semanas válidas.");
+        return;
+    }
+
+    const startOfYear = new Date(new Date().getFullYear(), 0, 1); 
+    const daysInWeek = 7;
+
+    const firstWeekDay = (weeks[0] - 1) * daysInWeek;
+    const startDate = new Date(startOfYear);
+    startDate.setDate(startDate.getDate() + firstWeekDay);
+
+    const lastWeekDay = (weeks[weeks.length - 1] - 1) * daysInWeek + 6;
+    const endDate = new Date(startOfYear);
+    endDate.setDate(endDate.getDate() + lastWeekDay);
+
+    document.getElementById('startDate').value = formatDate(startDate);
+    document.getElementById('endDate').value = formatDate(endDate);
+}
+
+function formatDate(date) {
+    let d = new Date(date),
+        month = '' + (d.getMonth() + 1),
+        day = '' + d.getDate(),
+        year = d.getFullYear();
+
+    if (month.length < 2) month = '0' + month;
+    if (day.length < 2) day = '0' + day;
+
+    return [year, month, day].join('-');
+}

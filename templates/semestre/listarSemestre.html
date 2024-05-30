@@ -7,6 +7,13 @@
 <div class="container">
 
     <a href="/agregar_semestre" class="btn btn-primary">AGREGAR</a>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        {% for category, message in messages %}
+            <div class="alert alert-{{ category }}">{{ message }}</div>
+        {% endfor %}
+    {% endif %}
+    {% endwith %}
     <div class="row">
         <div class="col-12">
             <h1 class="text-center">Listar Semestre</h1>

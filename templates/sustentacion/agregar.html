@@ -1,0 +1,70 @@
+{% extends "index.html" %}
+
+{% block title %}Editar Semestre{% endblock %}
+
+{% block bloque %}
+
+<!-- listar sustentacion -->
+
+<div class="container">
+
+    <div class="row">
+
+        <div class="col-12">
+
+            <table class="table">
+
+                <thead>
+
+                    <tr>
+
+                        <th>Semestre</th>
+
+                        <th>Curso</th>
+
+                        <th>Tipo Sustentacion</th>
+
+                        <th>Semanas</th>
+
+                        <th>Desde</th>
+                        <th>Hasta</th>
+                        <th>Duracion de cada sustentacion</th>
+                        <th>¿ Compensara ?</th>
+                    </tr>
+
+                </thead>
+
+                <tbody>
+
+                    {% for sustentacion in sustentaciones %}
+                    <tr data-id="{{ sustentacion.idSustentacion }}">
+                        <td>{{ sustentacion.nom_semestre }}</td>
+
+                        <td>{{ sustentacion.nombre_curso }}</td>
+
+                        <td>{{ sustentacion.tipo_sustentacion }}</td>
+
+                        <td>{{ sustentacion.semanas }}</td>
+
+                        <td>{{ sustentacion.fecha_inicio }}</td>
+
+                        <td>{{ sustentacion.fecha_fin }}</td>
+
+                        <td>{{ sustentacion.duracion_maxima }}</td>
+
+                        <td>{{ sustentacion.compensacion }}</td>
+
+                    </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+</div>
+
+{% endblock %}
