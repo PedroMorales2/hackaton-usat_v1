@@ -1,0 +1,130 @@
+{% extends "index.html" %}
+
+{% block title %}Editar Semestre{% endblock %}
+
+{% block bloque %}
+
+<div>
+
+    <div class="row">
+        <div class="col-sm-6 mb-3 mb-sm-0">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Ciclo : {{ sus.nom_semestre }}</h5>
+                    <p class="card-text">Curso: {{ sus.nombre_curso }}</p>
+                    <p class="card-text">Grupo: {{ sus.denominacion }}</p>
+                    <p class="card-text">Tipo Sustentacion: {{ sus.tipo_sustentacion }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-6">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Nombre del docente: {{ sus.nombre_docente }} </h5>
+                    <p class="card-text">Correo: {{ sus.correo }}</p>
+                    <p class="card-text">Telefono: {{ sus.telefono }}</p>
+                    <p class="card-text">Tipo Docente: {{ sus.dedicacion }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <br>
+    <hr>
+
+    <form class="was-validated" method="post" action="/gestion_estudiantes/{{ sus.idSustentacion }}"
+        enctype="multipart/form-data">
+        <div class="mb-3">
+            <h5 class="card-title">Subir archivo XML de Estudiantes</h5>
+        </div>
+        <div class="mb-3">
+            <input type="file" class="form-control" name="file" accept=".xml, .xlsx, .csv" required>
+        </div>
+
+        <div class="mb-3">
+            <button class="btn btn-primary" type="submit">Submit form</button>
+        </div>
+    </form>
+
+    <br>
+    <hr>
+    <br>
+    {% if sus.idCurso==1 %}
+    <form action="/sustentacion/proyecto/agregar_usuario/{{ sus.idSustentacion }}" method="post">
+        <div class="table p-3">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Semestre</th>
+                        <th>Código Universitario</th>
+                        <th>Apellidos y Nombres</th>
+                        <th>Email</th>
+                        <th>Telefono</th>
+                        <!-- <th>Jurado 1</th>
+                        <th>Jurado 2</th> -->
+                        <th>Asesor (Jurado 3)</th>
+                        <th>Título de Tesis</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for index in estudiantes %}
+                    <tr>
+                        <td><input type="text" class="input_para_ubicar" name="semestre[]" value="{{ estudiantes[index]['Semestre'] }}"></td>
+                        <td><input type="text" class="input_para_ubicar" name="codigo_universitario[]" value="{{ estudiantes[index]['Codigo Universitario'] }}"></td>
+                        <td><input type="text" class="input_para_ubicar" name="apellidos_nombres[]" value="{{ estudiantes[index]['Apellidos y Nombres'] }}"></td>
+                        <td><input type="text" class="input_para_ubicar" name="email[]" value="{{ estudiantes[index]['Email'] }}"></td>
+                        <td><input type="text" class="input_para_ubicar" name="telefono[]" value="{{ estudiantes[index]['Telefono'] }}"></td>
+                        <!-- <td><input type="text" class="input_para_ubicar" name="jurado_1[]" value="{{ estudiantes[index]['Jurado 1'] }}"></td> -->
+                        <!-- <td><input type="text" class="input_para_ubicar" name="jurado_2[]" value="{{ estudiantes[index]['Jurado 2'] }}"></td> -->
+                        <td><input type="text" class="input_para_ubicar" name="asesor[]" value="{{ estudiantes[index]['Asesor'] }}"></td>
+                        <td><input type="text" class="input_para_ubicar" name="titulo_tesis[]" value="{{ estudiantes[index]['Título de Tesis'] }}"></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <button type="submit">agregar</button>
+    </form>
+
+    {% else %}
+    <form action="/sustentacion/disc/agregar_usuario/{{ sus.idSustentacion }}" method="post">
+        <div class="table p-3">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Semestre</th>
+                        <th>Código Universitario</th>
+                        <th>Apellidos y Nombres</th>
+                        <th>Email</th>
+                        <th>Telefono</th>
+                        <th>Jurado 1</th>
+                        <th>Jurado 2</th>
+                        <th>Asesor (Jurado 3)</th>
+                        <th>Título de Tesis</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for index in estudiantes %}
+                    <tr>
+                        <td><input type="text" class="input_para_ubicar" name="semestre[]" value="{{ estudiantes[index]['Semestre'] }}"></td>
+                        <td><input type="text" class="input_para_ubicar" name="codigo_universitario[]" value="{{ estudiantes[index]['Codigo Universitario'] }}"></td>
+                        <td><input type="text" class="input_para_ubicar" name="apellidos_nombres[]" value="{{ estudiantes[index]['Apellidos y Nombres'] }}"></td>
+                        <td><input type="text" class="input_para_ubicar" name="email[]" value="{{ estudiantes[index]['Email'] }}"></td>
+                        <td><input type="text" class="input_para_ubicar" name="telefono[]" value="{{ estudiantes[index]['Telefono'] }}"></td>
+                        <td><input type="text" class="input_para_ubicar" name="jurado_1[]" value="{{ estudiantes[index]['Jurado 1'] }}"></td>
+                        <td><input type="text" class="input_para_ubicar" name="jurado_2[]" value="{{ estudiantes[index]['Jurado 2'] }}"></td>
+                        <td><input type="text" class="input_para_ubicar" name="asesor[]" value="{{ estudiantes[index]['Asesor'] }}"></td>
+                        <td><input type="text" class="input_para_ubicar" name="titulo_tesis[]" value="{{ estudiantes[index]['Título de Tesis'] }}"></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <button type="submit">agregar</button>
+    </form>
+
+
+    {% endif %}
+</div>
+
+{% endblock %}

@@ -9,3 +9,14 @@
 .clickable-row:hover {
     background-color: #b26868; 
 }
+
+#semestre{
+    font-family: Arial, Helvetica, sans-serif;
+    color: red;
+    text-align: center;
+}
+
+.input_para_ubicar{
+    margin-left: -10px;
+    width: 75%;
+}

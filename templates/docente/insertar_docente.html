@@ -16,8 +16,7 @@
         <thead>
             <tr>
                 <th>Semestre</th>
-                <th>Nombre</th>
-                <th>Apellido</th>
+                <th>Nombre Completo</th>
                 <th>Correo</th>
                 <th>Dedicación</th>
                 <th>Teléfono</th>
@@ -32,8 +31,6 @@
                         class="td"></td>
                 <td><input type="text" class="form-control-plaintext" name="nombre[]" value="{{ docente.nombre }}"
                         class="td"></td>
-                <td><input type="text" class="form-control-plaintext" name="apellido[]" value="{{ docente.apellido }}">
-                </td>
                 <td><input type="text" class="form-control-plaintext" name="correo[]" value="{{ docente.correo }}"></td>
                 <td><input type="text" class="form-control-plaintext" name="dedicacion[]"
                         value="{{ docente.dedicacion }}"></td>
@@ -78,12 +75,6 @@
                         <label for="nombre" class="col-sm-2 col-form-label">Nombre</label>
                         <div class="col-sm-10">
                             <input type="text" class="form-control" name="nombre" value="{{ docente.nombre }}">
-                        </div>
-                    </div>
-                    <div class="form-group row">
-                        <label for="apellido" class="col-sm-2 col-form-label">Apellido</label>
-                        <div class="col-sm-10">
-                            <input type="text" class="form-control" name="apellido" value="{{ docente.apellido }}">
                         </div>
                     </div>
                     <div class="form-group row">

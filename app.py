@@ -91,7 +91,7 @@ def upload_and_display():
                     root = tree.getroot()
                     for docente in root.findall('.//docente'):
                         data = {}
-                        fields = ['semestre', 'nombre', 'apellido', 'correo', 'dedicacion', 'telefono','hora_disponible']
+                        fields = ['semestre', 'nombre', 'correo', 'dedicacion', 'telefono','hora_disponible']
                         for field in fields:
                             element = docente.find(field)
                             if element is not None:
@@ -106,7 +106,7 @@ def upload_and_display():
                     else:
                         df = pd.read_csv(file, header=None)
                     
-                    expected_columns = ['semestre', 'nombre', 'apellido', 'correo', 'dedicacion', 'telefono','hora_disponible']
+                    expected_columns = ['semestre', 'nombre', 'correo', 'dedicacion', 'telefono','hora_disponible']
                     start_row = find_start_row(df, expected_columns)
                     if start_row is not None:
                         df.columns = df.iloc[start_row].apply(lambda x: x.lower() if isinstance(x, str) else x)
@@ -125,7 +125,6 @@ def update_docente():
     index = int(request.form['index'])
     docentes[index]['semestre'] = request.form['semestre']
     docentes[index]['nombre'] = request.form['nombre']
-    docentes[index]['apellido'] = request.form['apellido']
     docentes[index]['correo'] = request.form['correo']
     docentes[index]['dedicacion'] = request.form['dedicacion']
     docentes[index]['telefono'] = request.form['telefono']
@@ -139,14 +138,13 @@ def insertar_docente():
     try: 
         semestre = request.form.getlist('semestre[]')
         nombre = request.form.getlist('nombre[]')
-        apellido = request.form.getlist('apellido[]')
         correo = request.form.getlist('correo[]')
         dedicacion = request.form.getlist('dedicacion[]')
         telefono = request.form.getlist('telefono[]')
         horas_asesoria = request.form.getlist('hora_disponible[]')
 
         for i in range(len(nombre)):  # Asumimos que todas las listas tienen la misma longitud
-            doc.insertarDocente(semestre[i], nombre[i], apellido[i], correo[i], dedicacion[i], telefono[i], horas_asesoria[i])
+            doc.insertarDocente(semestre[i], nombre[i], correo[i], dedicacion[i], telefono[i], horas_asesoria[i])
         global docentes
         docentes = []
         flash('Todos los docentes han sido insertados exitosamente.', 'success')
@@ -268,7 +266,96 @@ def insertar_sustentacion_grupo():
 @app.route('/sustentaciones_grupo')
 def sustentacionesGrupo():
     sustentaciones = sus.listarSustentaciones()
-    return render_template('sustentacion/agregar.html', sustentaciones = sustentaciones)
+    return render_template('sustentacion/sustentacion_lista_N1.html', sustentaciones = sustentaciones)
+
+@app.route('/sustentacion/usuarios/<int:id>')
+def sustentacionUsuarios(id):
+    suss = sus.listarSustentacionesXID(id)
+    return render_template('sustentacion/estudiantes_sustentacion.html', sus = suss)
+
+
+
+########## ESTUDIANTES
+
+estudiantes = {}
+
+# formatear los campos vacios de la fila
+def format_row(row):
+    return {k: v if v else 'No especificado' for k, v in row.items()}
+
+
+
+@app.route('/gestion_estudiantes/<int:id>', methods=['GET', 'POST'])
+def gestion_estudiantes(id):
+    global estudiantes
+    suss = sus.listarSustentacionesXID(id)
+    if request.method == 'POST' and 'file' in request.files:
+        file = request.files['file']
+        if file and file.filename.endswith(('.xlsx', '.csv')):
+           
+            df = pd.read_excel(file) if file.filename.endswith('.xlsx') else pd.read_csv(file)
+            
+            
+            df.columns = [str(col).strip() for col in df.columns] 
+            
+            
+            estudiantes = {i: row.to_dict() for i, row in df.iterrows()}
+        else:
+            return render_template('sustentacion/estudiantes_sustentacion.html', estudiantes=estudiantes, error='Formato de archivo no soportado o no enviado')
+
+    return render_template('sustentacion/estudiantes_sustentacion.html', estudiantes=estudiantes, sus = suss)
+
+
+@app.route('/sustentacion/proyecto/agregar_usuario/<int:id>', methods=['POST'])
+def agregar_estudiantes_proyecto(id):
+    codigo = request.form.getlist('codigo_universitario[]')
+    nombres = request.form.getlist('apellidos_nombres[]')
+    email = request.form.getlist('email[]')
+    telefono = request.form.getlist('telefono[]')
+    asesor = request.form.getlist('asesor[]')
+    
+    titulo = request.form.getlist('titulo_tesis[]')
+    for i in range(len(nombres)):
+        sus.agregarDocenteSustentacion_proyecto(codigo[i], nombres[i], email[i], telefono[i], asesor[i], id, titulo[i])
+    global docentes
+    docentes = []
+    return redirect(url_for('sustentacionesGrupo'))
+                            
+
+@app.route('/sustentacion/disc/agregar_usuario/<int:id>', methods=['POST'])
+def agregar_estudiantes_disc(id):
+    codigo = request.form.getlist('codigo_universitario[]')
+    nombres = request.form.getlist('apellidos_nombres[]')
+    email = request.form.getlist('email[]')
+    telefono = request.form.getlist('telefono[]')
+    asesor = request.form.getlist('asesor[]')
+    jurado1 = request.form.getlist('jurado_1[]')  # Corregir aquí también, según el HTML
+    jurado2 = request.form.getlist('jurado_2[]')  # Corregir aquí también, según el HTML
+    titulo = request.form.getlist('titulo_tesis[]')
+    for i in range(len(nombres)):
+        sus.agregarDocenteSustentacion_disc(codigo[i], nombres[i], email[i], telefono[i], jurado1[i], jurado2[i], asesor[i], id, titulo[i])
+    global docentes
+    docentes = []
+    return redirect(url_for('sustentacionesGrupo'))    
+
+
+# @app.route('/update_docente', methods=['POST'])
+# def update_docente():
+#     index = int(request.form['index'])
+#     docentes[index]['semestre'] = request.form['semestre']
+#     docentes[index]['nombre'] = request.form['nombre']
+#     docentes[index]['apellido'] = request.form['apellido']
+#     docentes[index]['correo'] = request.form['correo']
+#     docentes[index]['dedicacion'] = request.form['dedicacion']
+#     docentes[index]['telefono'] = request.form['telefono']
+#     docentes[index]['hora_disponible'] = request.form['hora_disponible']
+#     return redirect(url_for('upload_and_display'))
+
+
+@app.route('/ir_a_sustentacion_prueba')
+def ir_a_sustentacion_prueba():
+    return render_template('sustentacion/tabla.html')
+
 
 
 

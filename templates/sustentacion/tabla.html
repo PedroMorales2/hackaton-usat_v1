@@ -1,0 +1,65 @@
+{% extends "sustentacion_lista.html" %}
+
+{% block title %}Editar Semestre{% endblock %}
+
+{% block bloque %}
+
+
+<h2>Subir archivo XML de Estudiantes</h2>
+<form method="POST" action="/insertar/estudiantes" enctype="multipart/form-data">
+    <input type="file" name="file" accept=".xml, .xlsx, .csv">
+    <button type="submit" class="btn btn-primary">Subir</button>
+</form>
+
+
+<form action="/insertar_docente" method="post">
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Semestre</th>
+                <th>Codigo Univesitario</th>
+                <th>Apellido y nombres</th>
+                <th>Email</th>
+                <th>telefono</th>
+                <th>Jurado 1</th>
+                <th>Jurado 2</th>
+                <th>Asesor</th>
+                <th>Titulo de tesis</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for es in estudiantes %}
+            <tr>
+                <td><input type="text" class="form-control-plaintext" name="semestre[]" value="{{ es[0] }}" class="td">
+                </td>
+                <td><input type="text" class="form-control-plaintext" name="nombre[]" value="{{ es[1] }}" class="td">
+                </td>
+                <td><input type="text" class="form-control-plaintext" name="apellido[]" value="{{ es[2] }}">
+                </td>
+                <td><input type="text" class="form-control-plaintext" name="correo[]" value="{{ es[3] }}"></td>
+                <td><input type="text" class="form-control-plaintext" name="dedicacion[]"
+                        value="{{ docente.dedicacion }}"></td>
+                <td><input type="text" class="form-control-plaintext" name="telefono[]" value="{{ es[4] }}">
+                </td>
+                <td><input type="text" class="form-control-plaintext" name="hora_disponible[]" value="{{ es[5] }}"></td>
+                <td>
+                <td><input type="text" class="form-control-plaintext" name="hora_disponible[]" value="{{ es[6] }}"></td>
+                <td>
+                <td><input type="text" class="form-control-plaintext" name="hora_disponible[]" value="{{ es[7] }}"></td>
+                <td>
+                <td><input type="text" class="form-control-plaintext" name="hora_disponible[]" value="{{ es[8] }}"></td>
+                <td>
+                   
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <button type="submit" class="btn btn-primary">Insertar Todos</button>
+</form>
+
+
+
+
+
+{% endblock %}

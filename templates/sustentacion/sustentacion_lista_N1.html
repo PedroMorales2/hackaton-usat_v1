@@ -21,7 +21,7 @@
                         <th>Semestre</th>
 
                         <th>Curso</th>
-
+                    
                         <th>Tipo Sustentacion</th>
 
                         <th>Semanas</th>
@@ -30,6 +30,7 @@
                         <th>Hasta</th>
                         <th>Duracion de cada sustentacion</th>
                         <th>¿ Compensara ?</th>
+                        <th>Agregar Estudiantes</th>
                     </tr>
 
                 </thead>
@@ -40,7 +41,7 @@
                     <tr data-id="{{ sustentacion.idSustentacion }}">
                         <td>{{ sustentacion.nom_semestre }}</td>
 
-                        <td>{{ sustentacion.nombre_curso }}</td>
+                        <td>{{ sustentacion.nombre_curso }} - {{ sustentacion.denominacion }}</td>
 
                         <td>{{ sustentacion.tipo_sustentacion }}</td>
 
@@ -54,6 +55,9 @@
 
                         <td>{{ sustentacion.compensacion }}</td>
 
+                        <td><a href="/sustentacion/usuarios/{{ sustentacion.idSustentacion }}" class="btn btn-primary">Agregar Estudiantes</a></td>
+                        <!-- <td><a href="/sustentacion/usuarios" class="btn btn-primary">Agregar Estudiantes</a></td> -->
+                        
                     </tr>
 
                     {% endfor %}
