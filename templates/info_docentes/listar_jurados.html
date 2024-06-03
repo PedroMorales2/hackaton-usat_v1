@@ -1,0 +1,40 @@
+{% extends "modulo_docente.html" %}
+
+{% block bloque %}
+
+<!-- {% if cur %}
+    <a href="/listar_asesor_jurado/{{ cur[0].id_docentes }}" class="btn btn-success">Ver Asesor Jurado</a>
+{% endif %} -->
+
+
+<div class="mb-3">
+    <a href="/ver_cursos_asignados_docentes/{{ cur[0].id_docentes }}" class="btn btn-secondary">Regresar</a>
+</div>
+
+
+<div class="container mt-5">
+    <h1 class="text-center mb-4">Estas son las Asesorías</h1>
+    <table class="table table-hover table-striped table-bordered">
+        <thead class="table-dark">
+            <tr>
+                <th>Nombre Curso</th>
+                <th>Nombre Estudiante</th>
+                <th>Codigo del estudiante</th>
+                <th>Rol Docente</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for asesora in cur %}
+            <tr>
+                <td>{{ asesora.nombre_curso }}</td>
+                <td>{{ asesora.nombre_completo }}</td>
+                <td>{{ asesora.codAlumno }}</td>
+                <td>{{ asesora.roles }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+
+{% endblock %}

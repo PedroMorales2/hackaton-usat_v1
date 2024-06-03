@@ -4,6 +4,15 @@
 
 {% block bloque %}
 
+{% with messages = get_flashed_messages(with_categories=true) %}
+{% if messages %}
+{% for category, message in messages %}
+<div class="alert alert-{{ category }}">{{ message }}</div>
+{% endfor %}
+{% endif %}
+{% endwith %}
+
+
 <div class="container">
 
     <div class="row">
@@ -102,21 +111,21 @@
                     <input type="hidden" name="index" value="{{ loop.index0 }}">
 
 
-                    <input type="text" class="form-control" id="semestre" name="id_grupo" value="{{ grupo.idGrupo }}">
+                    <input type="text" class="form-control" id="semestre" name="id_grupo" value="{{ grupo.idGrupo }}" hidden>
 
 
                     <div class="form-group row">
                         <label for="semestre" class="col-sm-2 col-form-label">Semestre</label>
                         <div class="col-sm-10">
                             <input type="text" class="form-control" id="semestre" name="semestre"
-                                value="{{ grupo.nom_semestre }}">
+                                value="{{ grupo.nom_semestre }}" disabled>
                         </div>
                     </div>
                     <div class="form-group row">
                         <label for="curso" class="col-sm-2 col-form-label">Curso</label>
                         <div class="col-sm-10">
                             <input type="text" class="form-control" id="curso" name="curso"
-                                value="{{ grupo.nombre_curso }}">
+                                value="{{ grupo.nombre_curso }}" disabled>
                         </div>
                     </div>
 
@@ -133,22 +142,24 @@
                     <div class="form-group row">
                         <label for="curso" class="col-sm-2 col-form-label">Semanas</label>
                         <div class="col-sm-10">
-                            <input type="text" id="weekNumbers" class="form-control" name="weekNumbers"
-                                onchange="updateDatesBasedOnWeeks(this.value)" required>
+                            <input type="text" id="weekNumbers-{{ loop.index }}" class="form-control" name="weekNumbers"
+                                onchange="updateDatesBasedOnWeeks(this.value, {{ loop.index }})" required>
                         </div>
                     </div>
 
                     <div class="form-group row">
                         <label for="curso" class="col-sm-2 col-form-label">Desde</label>
                         <div class="col-sm-10">
-                            <input type="date" id="startDate" class="form-control" name="startDate" readonly>
+                            <input type="date" id="startDate-{{ loop.index }}" class="form-control" name="startDate"
+                                readonly>
                         </div>
                     </div>
 
                     <div class="form-group row">
                         <label for="curso" class="col-sm-2 col-form-label">Hasta</label>
                         <div class="col-sm-10">
-                            <input type="date" id="endDate" name="endDate" class="form-control" readonly>
+                            <input type="date" id="endDate-{{ loop.index }}" class="form-control" name="endDate"
+                                readonly>
                         </div>
                     </div>
 
@@ -191,7 +202,7 @@
                 </button>
             </div>
             <div class="modal-body">
-                <form method="post" action="">
+                <form method="post" action="/actualizar_grupo/{{ grupo.idGrupo}}">
                     <input type="hidden" name="index" value="{{ loop.index0 }}">
                     <div class="form-group row">
                         <label for="denominacion" class="col-sm-2 col-form-label">Denominacion</label>
@@ -211,14 +222,14 @@
                         <label for="curso" class="col-sm-2 col-form-label">Curso</label>
                         <div class="col-sm-10">
                             <input type="text" class="form-control" id="curso" name="curso"
-                                value="{{ grupo.nombre_curso }}">
+                                value="{{ grupo.nombre_curso }}" disabled>
                         </div>
                     </div>
                     <div class="form-group row">
                         <label for="semestre" class="col-sm-2 col-form-label">Semestre</label>
                         <div class="col-sm-10">
                             <input type="text" class="form-control" id="semestre" name="semestre"
-                                value="{{ grupo.nom_semestre }}">
+                                value="{{ grupo.nom_semestre }}" disabled>
                         </div>
                     </div>
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>

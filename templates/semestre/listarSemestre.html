@@ -7,13 +7,18 @@
 <div class="container">
 
     <a href="/agregar_semestre" class="btn btn-primary">AGREGAR</a>
+
     {% with messages = get_flashed_messages(with_categories=true) %}
     {% if messages %}
-        {% for category, message in messages %}
-            <div class="alert alert-{{ category }}">{{ message }}</div>
-        {% endfor %}
+    {% for category, message in messages %}
+    <div class="alert alert-danger" role="alert">
+        {{ message }}
+    </div>
+    {% endfor %}
     {% endif %}
     {% endwith %}
+
+
     <div class="row">
         <div class="col-12">
             <h1 class="text-center">Listar Semestre</h1>
@@ -32,19 +37,24 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {% for semestre in semestre %}
+                    {% for semestre in semestrese %}
                     <tr class="clickable-row" data-id="{{ semestre.id_semestre }}">
                         <td>{{ semestre.nom_semestre }}</td>
                         <td>{{ semestre.fecha_inicio }}</td>
                         <td>{{ semestre.fecha_fin }}</td>
-                        <td>{{ semestre.vigencia }}</td>
                         
+                        {% if semestre.vigencia == 1 %}
+                        <td>Activo</td>
+                        {% else %}
+                        <td>Inactivo</td>
+                        {% endif %}
+
                     </tr>
                     {% endfor %}
                 </tbody>
             </table>
-            
-            
+
+
         </div>
     </div>
 

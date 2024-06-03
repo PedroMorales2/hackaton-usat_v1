@@ -1,8 +1,8 @@
 from controladores.bd import conexion
 
-con = conexion()
 
 def listar():
+    con = conexion()
     try:
         cursor = con.cursor()
         cursor.execute("SELECT * FROM curso")
@@ -15,6 +15,7 @@ def listar():
         cursor.close()
         
 def buscar(id):
+    con = conexion()
     try:
         cursor = con.cursor()
         cursor.execute("SELECT * FROM curso WHERE idCurso = %s", (id,))
@@ -27,6 +28,7 @@ def buscar(id):
         cursor.close()
    
 def insertarCurso(nombre):
+   con = conexion()
    try:
         cursor = con.cursor()
         cursor.execute("INSERT INTO curso (nombre_curso) VALUES (%s)", (nombre,))
@@ -37,6 +39,7 @@ def insertarCurso(nombre):
         cursor.close()
 
 def actualizarCurso(id, nombre):
+    con = conexion()
     try:
         cursor = con.cursor()
         cursor.execute("UPDATE curso SET nombre_curso = %s WHERE idCurso = %s", (nombre, id))
@@ -47,6 +50,7 @@ def actualizarCurso(id, nombre):
         cursor.close()
 
 def eliminarCurso(id):
+    con = conexion()
     try:
         cursor = con.cursor()
         cursor.execute("DELETE FROM curso WHERE idCurso = %s", (id,))

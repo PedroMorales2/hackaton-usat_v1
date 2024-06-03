@@ -20,3 +20,34 @@
     margin-left: -10px;
     width: 75%;
 }
+
+.navbar {
+    background-color: #0056b3; /* Azul oscuro personalizado */
+    border-bottom: 3px solid #ffc107; /* Barra amarilla para destacar */
+}
+
+.nav-link {
+    transition: color 0.3s ease-in-out;
+}
+
+.nav-link:hover, .nav-link:focus {
+    color: #ffc107; /* Amarillo al pasar el mouse o enfocar */
+    text-decoration: underline;
+}
+
+.dropdown-menu {
+    border-color: #ffc107; /* Borde del menú desplegable */
+}
+
+#sidebar-container {
+    width: 250px; /* Adjust the width of the sidebar */
+    min-height: 100vh; /* Full height */
+}
+
+.bg-dark {
+    background-color: #343a40!important;
+}
+
+.nav-link {
+    color: #fff!important; /* White text color */
+}

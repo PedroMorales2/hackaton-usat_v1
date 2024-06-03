@@ -6,6 +6,15 @@
 
 <!-- listar sustentacion -->
 
+{% with messages = get_flashed_messages(with_categories=true) %}
+{% if messages %}
+{% for category, message in messages %}
+<div class="alert alert-{{ category }}">{{ message }}</div>
+{% endfor %}
+{% endif %}
+{% endwith %}
+
+
 <div class="container">
 
     <div class="row">
@@ -21,7 +30,7 @@
                         <th>Semestre</th>
 
                         <th>Curso</th>
-                    
+
                         <th>Tipo Sustentacion</th>
 
                         <th>Semanas</th>
@@ -55,9 +64,10 @@
 
                         <td>{{ sustentacion.compensacion }}</td>
 
-                        <td><a href="/sustentacion/usuarios/{{ sustentacion.idSustentacion }}" class="btn btn-primary">Agregar Estudiantes</a></td>
+                        <td><a href="/sustentacion/usuarios/{{ sustentacion.idSustentacion }}"
+                                class="btn btn-primary">Agregar Estudiantes</a></td>
                         <!-- <td><a href="/sustentacion/usuarios" class="btn btn-primary">Agregar Estudiantes</a></td> -->
-                        
+
                     </tr>
 
                     {% endfor %}

@@ -1,8 +1,7 @@
 from controladores.bd import conexion
 
-con = conexion()
-
 def listar():
+    con = conexion()
     with con.cursor() as cursor:
         try:
             cursor.execute('SELECT * FROM semestre_academico')
@@ -13,30 +12,27 @@ def listar():
         finally:
             cursor.close()
             
+            
 def insertarSemestre(nombre, fecha_inicio, fecha_fin, vigencia):
     con = conexion()  
-    try:
-        with con.cursor() as cursor:
-            cursor.execute('SELECT * FROM semestre_academico WHERE nom_semestre = %s', (nombre,))
-            if cursor.fetchone() is not None:
-                return False 
-            cursor.execute('INSERT INTO semestre_academico (nom_semestre, fecha_inicio, fecha_fin, vigencia) VALUES (%s, %s, %s, %s)', 
-                           (nombre, fecha_inicio, fecha_fin, vigencia))
-            con.commit()
-            return True
-    except Exception as e:
-        print("Error al insertar semestre:", e)
-        con.rollback()
-        return False
-    finally:
-        cursor.close()  
+
+    with con.cursor() as cursor:
+        cursor.execute('SELECT * FROM semestre_academico WHERE nom_semestre = %s', (nombre,))
+        if cursor.fetchone() is not None:
+            return False 
+        cursor.execute('INSERT INTO semestre_academico (nom_semestre, fecha_inicio, fecha_fin, vigencia) VALUES (%s, %s, %s, %s)', 
+                       (nombre, fecha_inicio, fecha_fin, vigencia))
+        con.commit()
+        return True
 
 def eliminarSemestre(id):
+    con = conexion()
     with con.cursor() as cursor:
         cursor.execute('DELETE FROM semestre_academico WHERE id_semestre = %s', (id))
         con.commit()
         
 def editarSemestre(id, nombre, fecha_inicio, fecha_fin, vigencia):
+    
     con = conexion()  
     try:
         with con.cursor() as cursor:
@@ -51,14 +47,16 @@ def editarSemestre(id, nombre, fecha_inicio, fecha_fin, vigencia):
         con.rollback()
         return False
     finally:
-        con.close()  
+        cursor.close()  
         
 def buscarSemestre(id):
+    con = conexion()
     with con.cursor() as cursor:
         cursor.execute('SELECT * FROM semestre_academico WHERE id_semestre = %s', (id))
         return cursor.fetchone()
     
 def buscarSemestrePorNombre(nombre):
+    con = conexion()
     with con.cursor() as cursor:
         cursor.execute('SELECT * FROM semestre_academico WHERE nombre = %s', (nombre))
         return cursor.fetchone()

@@ -1,0 +1,241 @@
+{% extends "modulo_docente.html" %}
+
+
+{% block bloque %}
+
+<div class="container mt-5">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    {% for category, message in messages %}
+    <div class="alert alert-{{category}} alert-dismissible fade show" role="alert">
+        <strong>{{ message }}</strong>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      </div>
+    {% endfor %}
+    {% endif %}
+    {% endwith %}
+    <style>
+        .stylish-header {
+            font-family: 'Arial', sans-serif;
+            /* Fuente más moderna */
+            color: #28527a;
+            /* Color azul oscuro para un look más profesional */
+            text-shadow: 1px 1px 2px #ffffff;
+            /* Sombra ligera para destacar el texto */
+            padding: 20px;
+            background-image: linear-gradient(to right, #74ebd5, #acb6e5);
+            /* Gradiente suave de fondo */
+            border-radius: 10px;
+            /* Bordes redondeados */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            /* Sombra sutil para profundidad */
+            margin: 20px auto;
+            /* Ajuste de márgenes para centralizar y dar espacio */
+            width: fit-content;
+
+            /* Ajustar el ancho al contenido */
+
+        }
+
+        .navbar {
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+            /* Espacio adicional debajo de la barra de navegación */
+        }
+
+        .navbar-nav {
+            margin-left: auto;
+            /* Asegura que los ítems de la nav estén alineados a la derecha */
+        }
+
+        .nav-item {
+            margin-right: 20px;
+            /* Espacio entre cada ítem de la nav */
+        }
+
+        .stylish-button {
+            padding: 12px 24px;
+            /* Aumenta el padding para hacer los botones más grandes */
+            transition: all 0.3s ease;
+            border-radius: 5px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .stylish-button:hover {
+            background-color: #f8f9fa;
+            color: #333;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container">
+            <a class="navbar-brand" href="#">Inicio</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ml-auto">
+                    {% if cur %}
+                    <li class="nav-item active">
+                        <a href="/listar_asesor_jurado/{{ cur[0].id_docentes }}"
+                            class="btn btn-success stylish-button">Ver Asesor Jurado</a>
+                    </li>
+                    {% endif %}
+                    <li class="nav-item">
+                        <a href="/logout" class="btn btn-danger stylish-button">SALIR</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+
+
+    <h1 class="text-center my-4 stylish-header">Bienvenido Docente</h1>
+
+
+
+    <div class="card shadow">
+        <div class="card-header bg-dark text-white">
+            <h2 class="text-center">Cursos Asignados</h2>
+        </div>
+        <div class="card-body bg-light">
+            <table class="table table-hover">
+                <thead class="thead-dark">
+                    <tr>
+                        <th>Denominación</th>
+                        <th>Semestre</th>
+                        <th>Nombre del Curso</th>
+                        <th>Fecha Inicio</th>
+                        <th>Fecha Fin</th>
+                        <th>Tipo de Sustentación</th>
+                        <th>Duración Máxima</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for cu in cur %}
+                    <tr>
+                        <td>{{ cu.denominacion }}</td>
+                        <td>{{ cu.nom_semestre }}</td>
+                        <td>{{ cu.nombre_curso }}</td>
+                        <td>{{ cu.fecha_inicio }}</td>
+                        <td>{{ cu.fecha_fin }}</td>
+                        <td>{{ cu.tipo_sustentacion }}</td>
+                        <td>{{ cu.duracion_maxima }}</td>
+                        <td>
+                            <button type="button" class="btn btn-info agregar-disponibilidad"
+                                data-id_docentes="{{ cu.id_docentes }}" data-id_sustentacion="{{ cu.idSustentacion }}"
+                                data-fecha_inicio="{{ cu.fecha_inicio }}" data-fecha_fin="{{ cu.fecha_fin }}">
+                                Agregar Disponibilidad
+                            </button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para agregar disponibilidad -->
+<div class="modal fade" id="modalAgregarDisponibilidad" tabindex="-1" role="dialog"
+    aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Detalles de Disponibilidad</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="disponibilidadForm">
+                    <div class="form-group">
+                        <label for="fechaSeleccionada">Elegir una Fecha</label>
+                        <input type="date" class="form-control" id="fechaSeleccionada" name="fecha">
+                    </div>
+                    <div class="form-group">
+                        <label for="hora_inicio">Elegir hora de inicio</label>
+                        <input type="time" class="form-control" id="hora_inicio" name="h_inicio">
+                    </div>
+                    <div class="form-group">
+                        <label for="hora_fin">Elegir hora de fin</label>
+                        <input type="time" class="form-control" id="hora_fin" name="h_fin">
+                    </div>
+                    <button type="button" class="btn btn-primary" id="guardarDisponibilidadBtn">Agregar a la
+                        Lista</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Tabla para mostrar disponibilidades agregadas -->
+<div class="container mt-3">
+    <form action="/agregar_disponibilidad_horaria_docente" method="post">
+        <table class="table" id="tablaDisponibilidades">
+            <thead>
+                <tr>
+                    <th>Fecha</th>
+                    <th>Hora de Inicio</th>
+                    <th>Hora de Fin</th>
+                    <th>ID Docente</th>
+                    <th>ID Sustentacion</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Las filas se agregarán dinámicamente aquí -->
+            </tbody>
+        </table>
+        <button type="submit" class="btn btn-success">Guardar Disponibilidades</button>
+    </form>
+</div>
+
+<script>
+    document.querySelectorAll('.agregar-disponibilidad').forEach(button => {
+        button.addEventListener('click', function () {
+            // Configurar los valores en el modal basado en los datos del botón
+            var modal = $('#modalAgregarDisponibilidad');
+            modal.find('#fechaSeleccionada').attr('min', this.dataset.fecha_inicio);
+            modal.find('#fechaSeleccionada').attr('max', this.dataset.fecha_fin);
+            modal.find('#fechaSeleccionada').val(this.dataset.fecha_inicio);
+
+            // Guardar IDs en data attributes para usar después
+            modal.data('id_docentes', this.dataset.id_docentes);
+            modal.data('id_sustentacion', this.dataset.id_sustentacion);
+
+            $('#modalAgregarDisponibilidad').modal('show');
+        });
+    });
+
+    document.getElementById('guardarDisponibilidadBtn').addEventListener('click', function () {
+
+        
+        var modal = $('#modalAgregarDisponibilidad');
+        var tbody = document.getElementById('tablaDisponibilidades').getElementsByTagName('tbody')[0];
+        var row = tbody.insertRow();
+
+        row.insertCell(0).innerHTML = '<input type="date" name="fecha[]" class="form-control" value="' + modal.find('#fechaSeleccionada').val() + '">';
+        row.insertCell(1).innerHTML = '<input type="time" name="hora_inicio[]" class="form-control" value="' + modal.find('#hora_inicio').val() + '">';
+        row.insertCell(2).innerHTML = '<input type="time" name="hora_fin[]" class="form-control" value="' + modal.find('#hora_fin').val() + '">';
+        row.insertCell(3).innerHTML = '<input type="text" name="id_docentes[]" class="form-control" value="' + modal.data('id_docentes') + '"disable>';
+        row.insertCell(4).innerHTML = '<input type="text" name="id_sustentacion[]" class="form-control" value="' + modal.data('id_sustentacion') + '"disable>'; // Aquí se inserta el ID del docente
+        // row.insertCell(4).textContent = modal.data('id_sustentacion');
+
+        var deleteButton = document.createElement('button');
+        deleteButton.className = 'btn btn-danger';
+        deleteButton.textContent = 'Eliminar';
+        deleteButton.onclick = function () { row.remove(); };
+        row.insertCell(5).appendChild(deleteButton);
+
+        $('#modalAgregarDisponibilidad').modal('hide');  // Ocultar modal después de añadir
+    });
+</script>
+
+{% endblock %}

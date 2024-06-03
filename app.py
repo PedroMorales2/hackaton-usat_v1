@@ -6,10 +6,15 @@ import controladores.docentes as doc
 import controladores.cursos as cur
 import controladores.grupo_horario as gru
 import controladores.sustentacion as sus
+import controladores.disponibilidad_docente as disponi
+import controladores.cursos_asginados_docentes as cur_asig 
+import controladores.login as logi
+
 app = Flask(__name__)
 
 app.secret_key = 'mysecret key'
-@app.route('/')
+
+@app.route('/modulo_administrador')
 def home():
     return render_template('principal.html')
 
@@ -21,8 +26,8 @@ def index():
 
 @app.route('/semestres')
 def listarSemestre():
-    semestre = sem.listar()
-    return render_template('semestre/listarSemestre.html', semestre = semestre)
+    semestrese = sem.listar()
+    return render_template('semestre/listarSemestre.html', semestrese = semestrese)
 
 @app.route('/editar_semestre/<int:id>')
 def editarSemestre(id):
@@ -41,14 +46,21 @@ def actualizarSemestre(id):
     fecha_fin = request.form['fecha_fin']
     vigencia = request.form['vigencia']
     if not sem.editarSemestre(id,nombre, fecha_inicio, fecha_fin, vigencia):
-        flash('El semestre ya está agregado.', 'error')  # Usamos flash para enviar mensajes entre rutas
-        return redirect(url_for('agregarSemestre'))
-    return redirect(url_for('listarSemestre'))
+        error = {'message': 'El semestre ya está agregado.'} # Usamos flash para enviar mensajes entre rutas
+        return redirect(url_for('agregarSemestre', error=error))
+    return redirect(url_for('listarSemestre2'))
 
 
 @app.route('/agregar_semestre')
 def agregarSemestre():
     return render_template('semestre/agregar_semestre.html')
+
+@app.route('/listar_semestre2')
+def listarSemestre2():
+    semestrese = sem.listar()
+    return render_template('semestre/listarSemestre2.html', semestrese = semestrese)
+
+
 
 @app.route('/guardar_semestre', methods=['POST'])
 def guardar_semestre():
@@ -57,7 +69,7 @@ def guardar_semestre():
     fecha_fin = request.form['fecha_fin']
     vigencia = request.form['vigencia']
     if not sem.insertarSemestre(nombre, fecha_inicio, fecha_fin, vigencia):
-        flash('El semestre ya está agregado.', 'error')  # Usamos flash para enviar mensajes entre rutas
+        flash("El semestre ya está agregado.", "danger")  # Agrega un mensaje con categoría 'error'
         return redirect(url_for('agregarSemestre'))
     return redirect(url_for('listarSemestre'))
 
@@ -149,7 +161,7 @@ def insertar_docente():
         docentes = []
         flash('Todos los docentes han sido insertados exitosamente.', 'success')
     except Exception as e:
-        flash(f'Error al insertar docentes: {str(e)}', 'error')
+        flash(f'Error al insertar docentes: {str(e)}', 'danger')
     return redirect(url_for('upload_and_display'))
 
 
@@ -231,9 +243,9 @@ def agregar_grupo_curso():
     resultado = gru.agregarGrupo(denominacion, semestre, id_docente,id_curso)
     
     if resultado:
-        flash('Grupo agregado exitosamente.')
+        flash('Grupo agregado exitosamente.', 'success')
     else:
-        flash('Error al agregar el grupo.')
+        flash('Error al agregar el grupo.', 'danger')
 
 
     return redirect(url_for('listarGrupo'))
@@ -244,6 +256,12 @@ def agregar_grupo_curso():
 def listarGrupo():
     grupo = gru.listar_grupo_docente()
     return render_template('grupo_cursos/listar_grupo.html', grupo = grupo)
+
+@app.route('/listar_gruposXID/<int:id>')
+def listarGrupoXID(id):
+    grupo = gru.listar_grupo_docenteXSEM(id)
+    return render_template('grupo_cursos/listar_grupo.html', grupo = grupo)
+
 
 
 @app.route('/insertar_sustentacion_grupo', methods=['POST'])
@@ -261,6 +279,8 @@ def insertar_sustentacion_grupo():
     sus.agregarSustentacion(tipo_sustentacion, semanas, inicio, fin, duracion, com, id_grupo)
     # print(id_grupo, tipo_sustentacion, semanas, inicio, fin, duracion, com)
     return redirect(url_for('sustentacionesGrupo'))
+
+
 
 ######### sustentaciones
 @app.route('/sustentaciones_grupo')
@@ -316,9 +336,10 @@ def agregar_estudiantes_proyecto(id):
     
     titulo = request.form.getlist('titulo_tesis[]')
     for i in range(len(nombres)):
-        sus.agregarDocenteSustentacion_proyecto(codigo[i], nombres[i], email[i], telefono[i], asesor[i], id, titulo[i])
-    global docentes
-    docentes = []
+        if sus.agregarDocenteSustentacion_proyecto(codigo[i], nombres[i], email[i], telefono[i], asesor[i], id, titulo[i]):
+            flash('Estudiantes agregados exitosamente.', 'success')
+        else:
+            flash('Error al agregar el estudiante.', 'danger')
     return redirect(url_for('sustentacionesGrupo'))
                             
 
@@ -329,33 +350,89 @@ def agregar_estudiantes_disc(id):
     email = request.form.getlist('email[]')
     telefono = request.form.getlist('telefono[]')
     asesor = request.form.getlist('asesor[]')
-    jurado1 = request.form.getlist('jurado_1[]')  # Corregir aquí también, según el HTML
-    jurado2 = request.form.getlist('jurado_2[]')  # Corregir aquí también, según el HTML
+    jurado1 = request.form.getlist('jurado_1[]') 
+    jurado2 = request.form.getlist('jurado_2[]')  
     titulo = request.form.getlist('titulo_tesis[]')
     for i in range(len(nombres)):
         sus.agregarDocenteSustentacion_disc(codigo[i], nombres[i], email[i], telefono[i], jurado1[i], jurado2[i], asesor[i], id, titulo[i])
-    global docentes
-    docentes = []
+    # solo muestre un mensaje:
+    flash('Estudiantes agregados exitosamente.', 'success')
     return redirect(url_for('sustentacionesGrupo'))    
 
 
-# @app.route('/update_docente', methods=['POST'])
-# def update_docente():
-#     index = int(request.form['index'])
-#     docentes[index]['semestre'] = request.form['semestre']
-#     docentes[index]['nombre'] = request.form['nombre']
-#     docentes[index]['apellido'] = request.form['apellido']
-#     docentes[index]['correo'] = request.form['correo']
-#     docentes[index]['dedicacion'] = request.form['dedicacion']
-#     docentes[index]['telefono'] = request.form['telefono']
-#     docentes[index]['hora_disponible'] = request.form['hora_disponible']
-#     return redirect(url_for('upload_and_display'))
+@app.route('/')
+def mostrar_logueo():
+    return render_template('login.html')
 
 
-@app.route('/ir_a_sustentacion_prueba')
-def ir_a_sustentacion_prueba():
-    return render_template('sustentacion/tabla.html')
 
+@app.route('/ver_cursos_asignados_docentes/<int:id>')
+def ver_cursos_asignados_docentes(id):
+    cur = cur_asig.listar_cursos_asignados_docentes(id)
+    return render_template('info_docentes/ver_grupo.html', cur=cur)
+
+@app.route('/inicio_sesion', methods=['POST'])
+def inicio_sesion():
+    correo = request.form['correo']
+    contrasena = request.form['contrasena']
+    usuario = logi.login(correo, contrasena)
+    
+    if usuario is None:
+        flash('Correo o contraseña incorrectos.', 'danger')
+        return redirect(url_for('mostrar_logueo'))
+
+    # Asumimos que el estado del usuario indica su rol: 0 para administradores, 1 para docentes
+    if usuario['status'] == 0:
+        flash('ACCEDIDO CORRECTAMENTE.', 'success')
+        return render_template('principal.html', usuario=usuario)
+    elif usuario['status'] == 1:
+        flash('ACCEDIDO CORRECTAMENTE.', 'success')
+        return redirect(url_for('ver_cursos_asignados_docentes', id=usuario['id_docentes']))  # Usar ID del docente
+    else:
+        flash('Usuario no autorizado.', 'danger')
+        return redirect(url_for('mostrar_logueo'))
+    
+@app.route('/listar_asesor_jurado/<int:id>')
+def listar_asesor_juradosssss(id):
+    try:
+        cur = cur_asig.listar_asesor_jurado(id)
+        return render_template('info_docentes/listar_jurados.html', cur=cur)
+    except Exception as e:
+        flash(f'Error al listar asesores y jurados: No tienes ninguna disponibilidad asignado', 'danger')
+        return redirect(url_for('ver_cursos_asignados_docentes', id=id))
+
+
+@app.route('/logout')
+def logout():
+    session.clear()
+    flash('Has cerrado sesión exitosamente.', 'success')  # Mensaje opcional para confirmar el cierre de sesión
+    return redirect(url_for('mostrar_logueo'))  # Redirige al usuario a la página de inicio de sesión
+
+
+
+@app.route('/agregar_disponibilidad_horaria_docente', methods=['POST', 'GET'])
+def agregar_disponibilidad_horaria_docente():
+    if request.method == 'POST':
+        try:
+            fechas = request.form.getlist('fecha[]')
+            horas_inicio = request.form.getlist('hora_inicio[]')
+            horas_fin = request.form.getlist('hora_fin[]')
+            ids_docentes = request.form.getlist('id_docentes[]')
+            ids_sustentacion = request.form.getlist('id_sustentacion[]')
+            
+            for i in range(len(fechas)):
+                cur_asig.insertar_disponibilidad_docente(fechas[i], horas_inicio[i], horas_fin[i], ids_docentes[i], ids_sustentacion[i])
+
+            flash('Disponibilidad agregada exitosamente.', 'success')
+            return redirect(url_for('ver_cursos_asignados_docentes', id=ids_docentes[0]))  # Asumiendo que 'mostrar_logueo' no necesita argumentos adicionales
+
+        except Exception as e:
+            flash(f'Error al agregar la disponibilidad: {str(e)}', 'danger')
+            return redirect(url_for('ver_cursos_asignados_docentes', id=ids_docentes[0]))
+
+    else:
+        flash('Método no permitido para esta ruta.', 'danger')
+        return redirect(url_for('ver_cursos_asignados_docentes', id=ids_docentes[0] if ids_docentes else 0))
 
 
 
