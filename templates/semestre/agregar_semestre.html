@@ -6,34 +6,68 @@
     <h1 class="text-center">Agregar Semestre</h1>
     {% with messages = get_flashed_messages(with_categories=true) %}
     {% if messages %}
-        {% for category, message in messages %}
-            <div class="alert alert-{{ category }}">{{ message }}</div>
-        {% endfor %}
+    {% for category, message in messages %}
+    <div class="alert alert-{{ category }}">{{ message }}</div>
+    {% endfor %}
     {% endif %}
     {% endwith %}
     <a href="/semestres" class="btn btn-primary">Regresar</a>
     <hr>
     <br>
-    
+    <div class="alert alert-warning">CUANDO INSERTE UN NUEVO SEMESTRE SERA ACTIVO</div>
     <form action="/guardar_semestre" method="POST">
         <div class="mb-3">
             <label for="nombre" class="form-label">Nombre</label>
-            <input type="text" class="form-control" id="nombre" name="nombre">
+            <input type="text" class="form-control" id="nombre" name="nombre" required>
         </div>
         <div class="mb-3">
             <label for="fecha_inicio" class="form-label">Fecha Inicio</label>
-            <input type="date" class="form-control" id="fecha_inicio" name="fecha_inicio">
+            <input type="date" class="form-control" id="fecha_inicio" name="fecha_inicio" required >
         </div>
         <div class="mb-3">
             <label for="fecha_fin" class="form-label">Fecha Fin</label>
-            <input type="date" class="form-control" id="fecha_fin" name="fecha_fin">
+            <input type="date" class="form-control" id="fecha_fin" name="fecha_fin" required >
         </div>
-        <div class="mb-3">
-            <label for="vigencia" class="form-label">Vigencia</label>
-            <input type="text" class="form-control" id="vigencia" name="vigencia">
-        </div>
+
         <button type="submit" class="btn btn-primary">Guardar</button>
     </form>
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const nombreSemestreInput = document.getElementById('nombre');
+        const fechaInicioInput = document.getElementById('fecha_inicio');
+        const fechaFinInput = document.getElementById('fecha_fin');
+
+        nombreSemestreInput.addEventListener('change', function () {
+            const nombreSemestre = this.value;
+            setFechasSemestre(nombreSemestre);
+        });
+
+        function setFechasSemestre(nombre) {
+            const [anio, semestre] = nombre.split('-');
+            const fechasValidas = {
+                '1': ['02-13', '06-29'],
+                '2': ['07-25', '12-03'],
+                '0': ['01-22', '02-03']
+            };
+
+            if (semestre in fechasValidas) {
+                const inicio = `${anio}-${fechasValidas[semestre][0]}`;
+                const fin = `${anio}-${fechasValidas[semestre][1]}`;
+
+                fechaInicioInput.value = inicio;
+                fechaFinInput.value = fin;
+
+                // Establecer los atributos min y max para restringir la selección de fechas
+                fechaInicioInput.setAttribute('min', inicio);
+                fechaInicioInput.setAttribute('max', fin);
+                fechaFinInput.setAttribute('min', inicio);
+                fechaFinInput.setAttribute('max', fin);
+            }
+        }
+    });
+</script>
+
 
 {% endblock %}

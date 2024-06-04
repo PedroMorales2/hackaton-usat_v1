@@ -3,7 +3,7 @@
 {% block title %}Editar Semestre{% endblock %}
 
 {% block bloque %}
-
+<!-- 
 {% with messages = get_flashed_messages(with_categories=true) %}
 {% if messages %}
 {% for category, message in messages %}
@@ -19,7 +19,7 @@
 </div>
 {% endfor %}
 {% endif %}
-{% endwith %}
+{% endwith %} -->
 
 <form action="/agregar_disponibilidad_horaria_docente" class="form" method="post">
     <label for="fecha"> FECHA</label>
@@ -65,5 +65,35 @@
         </tr>
         {% endfor %}
 </table>
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+{% if messages %}
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        {% for category, message in messages %}
+        Swal.fire({
+            title: '{{ category|capitalize }}',
+            text: '{{ message }}',
+            icon: '{{ category }}',
+            showClass: {
+                popup: 'animate__animated animate__fadeInDown'
+            },
+            hideClass: {
+                popup: 'swal2-hide'
+            },
+            timer: 3000,
+            timerProgressBar: true,
+            didOpen: () => {
+                const audio = new Audio('../static/audio/notification.mp3');
+                audio.play();
+            }
+        });
+        {% endfor %}
+    });
+</script>
+{% endif %}
+{% endwith %}
+
+
 
 {% endblock %}

@@ -1,61 +1,66 @@
-import pandas as pd
-from pulp import LpMaximize, LpProblem, LpVariable, lpSum
+import controladores.asignacion_horaria as ase
+from ortools.sat.python import cp_model
+from datetime import datetime
 
-# Supongamos que esta es la carga de datos simulada
-profesores = pd.DataFrame({
-    'id': [1, 2, 3],
-    'nombre': ['Prof. A', 'Prof. B', 'Prof. C'],
-    'disponibilidad': [10, 8, 12]  # Horas disponibles para sustentaciones
-})
 
-# Función para asignar jurados
-def asignar_jurados(profesores, horas_necesarias=30):
-    # Modelo de optimización
-    model = LpProblem("Asignación_de_Jurados", LpMaximize)
+def convertir_a_bloques(hora_inicio_str, hora_fin_str):
+    formato = "%H:%M:%S"
+    try:
+        hora_inicio = datetime.strptime(hora_inicio_str, formato)
+        hora_fin = datetime.strptime(hora_fin_str, formato)
+    except ValueError as e:
+        print(f"Error al convertir las horas: {e}")
+        return []
 
-    # Variables de decisión: cada profesor puede ser o no ser asignado como jurado
-    x_vars = {row['id']: LpVariable(f"x_{row['id']}", cat='Binary') for index, row in profesores.iterrows()}
+    inicio_bloque = hora_inicio.hour - 8
+    fin_bloque = hora_fin.hour - 8
 
-    # Función objetivo: maximizar el número de profesores asignados, ponderado por disponibilidad
-    model += lpSum(x_vars[i] * profesores.loc[i-1, 'disponibilidad'] for i in x_vars), "Maximizar_Disponibilidad"
+    return list(range(inicio_bloque, fin_bloque))
 
-    # Restricción de horas necesarias
-    model += lpSum(x_vars[i] for i in x_vars) >= 3, "Minimo_Jurados"
+def main():
+    disponibilidad_docentes, jurados_por_alumno = ase.obtener_datos_de_la_base()
+    model = cp_model.CpModel()
 
-    # Solucionar el problema
-    model.solve()
+    num_horarios = 10  # Suponiendo 10 bloques horarios
+    horarios = {}
+    nombres_docentes = {}
 
-    # Resultados
-    resultados = {profesores.loc[i-1, 'nombre']: x_vars[i].value() for i in x_vars}
-    return resultados
+    # Asegúrate de que la estructura de datos para horarios y nombres_docentes se establece correctamente
+    for AlumnoIdAlumno, jurado1, jurado2, asesor in jurados_por_alumno:
+        horarios[AlumnoIdAlumno] = {
+            'jurado1': model.NewIntVar(0, num_horarios - 1, f'horario_jurado1_{AlumnoIdAlumno}'),
+            'jurado2': model.NewIntVar(0, num_horarios - 1, f'horario_jurado2_{AlumnoIdAlumno}'),
+            'asesor': model.NewIntVar(0, num_horarios - 1, f'horario_asesor_{AlumnoIdAlumno}')
+        }
+        nombres_docentes[AlumnoIdAlumno] = {
+            'jurado1': jurado1,
+            'jurado2': jurado2,
+            'asesor': asesor
+        }
 
-# Llamar a la función
-resultado_jurados = asignar_jurados(profesores)
-print("Asignación de Jurados:", resultado_jurados)
+    # Comprobación para evitar el TypeError
+    for alumno in horarios:
+        model.AddAllDifferent(list(horarios[alumno].values()))
 
-# Supongamos que tenemos horarios y disponibilidades en formato DataFrame
-horarios = pd.DataFrame({
-    'sesion_id': [1, 2, 3],
-    'horas_necesarias': [2, 2, 2]
-})
+    for id_docente, nombre, fecha, hora_inicio, hora_fin in disponibilidad_docentes:
+        bloques = convertir_a_bloques(hora_inicio, hora_fin)
+        for AlumnoIdAlumno in jurados_por_alumno:
+            for role in ['jurado1', 'jurado2', 'asesor']:
+                if nombres_docentes[AlumnoIdAlumno][role] == nombre:
+                    # Asegúrate de pasar valores hashables correctamente
+                    model.AddAllowedAssignments([horarios[AlumnoIdAlumno][role]], [(x,) for x in bloques])
 
-# Función para generar horarios óptimos
-def generar_horarios(horarios, profesores):
-    model = LpProblem("Generación_de_Horarios", LpMaximize)
+    solver = cp_model.CpSolver()
+    status = solver.Solve(model)
 
-    # Variables de decisión: cada sesión puede ser o no ser asignada a un horario
-    y_vars = {row['sesion_id']: LpVariable(f"y_{row['sesion_id']}", cat='Binary') for index, row in horarios.iterrows()}
+    if status == cp_model.OPTIMAL:
+        print('Horarios asignados:')
+        for alumno in horarios:
+            print(f'Alumno {alumno}:')
+            for role, var in horarios[alumno].items():
+                print(f'  {role} ({nombres_docentes[alumno][role]}) tiene el horario {solver.Value(var)} desde {8 + solver.Value(var)}:00 a {9 + solver.Value(var)}:00')
+    else:
+        print('No se encontró una solución óptima.')
 
-    # Función objetivo: maximizar la asignación de sesiones
-    model += lpSum(y_vars[i] * horarios.loc[i-1, 'horas_necesarias'] for i in y_vars), "Maximizar_Horarios"
-
-    # Solucionar el problema
-    model.solve()
-
-    # Resultados
-    resultados = {horarios.loc[i-1, 'sesion_id']: y_vars[i].value() for i in y_vars}
-    return resultados
-
-# Llamar a la función
-resultado_horarios = generar_horarios(horarios, profesores)
-print("Horarios Asignados:", resultado_horarios)
+if __name__ == '__main__':
+    main()

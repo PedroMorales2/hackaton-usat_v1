@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for, flash, session
+from flask import Flask, render_template, request, redirect, url_for, flash, session,jsonify
 import xml.etree.ElementTree as ET
 import pandas as pd
 import controladores.semestre as sem
@@ -18,9 +18,33 @@ app.secret_key = 'mysecret key'
 def home():
     return render_template('principal.html')
 
+@app.route('/eliminar_docente/<int:id>')
+def eliminar_docentes(id):
+    if doc.eliminar_docente(id):
+        flash('Docente eliminado exitosamente.', 'success')
+    else:
+        flash('Error al eliminar docente.', 'danger')
+    return redirect(url_for('listarDocente'))
+
 @app.route('/docentes')
 def index():
     return render_template('docente/insertar_docente.html')
+
+@app.route('/editar_docente', methods=['POST'])
+def editar_docentesss():
+    id_docente = request.form['id_docente']
+    nombre = request.form['nombre']
+    correo = request.form['correo']
+    contrasena = request.form['contrasena']
+    telefono = request.form['telefono'] 
+    print(f"Editando docente: id={id_docente}, nombre={nombre}, correo={correo}, telefono={telefono}, contrasena={contrasena}")
+    
+    if doc.editar_docente(nombre, correo, telefono, contrasena, id_docente):
+        flash('Docente editado exitosamente.', 'success')
+    else:
+        flash('Error al editar docente.', 'danger')    
+    return redirect(url_for('listarDocente'))
+
 
 #semestres
 
@@ -39,16 +63,28 @@ def eliminarSemestre(id):
     sem.eliminarSemestre(id)
     return redirect(url_for('listarSemestre'))
 
-@app.route('/actualizar_semestre/<int:id>', methods=['POST'])
-def actualizarSemestre(id):
-    nombre = request.form['nombre']
+@app.route('/actualizar_semestre', methods=['POST'])
+def actualizarSemestre():
+    id_semestre = request.form['id_semestre']
     fecha_inicio = request.form['fecha_inicio']
     fecha_fin = request.form['fecha_fin']
     vigencia = request.form['vigencia']
-    if not sem.editarSemestre(id,nombre, fecha_inicio, fecha_fin, vigencia):
-        error = {'message': 'El semestre ya está agregado.'} # Usamos flash para enviar mensajes entre rutas
-        return redirect(url_for('agregarSemestre', error=error))
-    return redirect(url_for('listarSemestre2'))
+    if not sem.editarSemestre(id_semestre, fecha_inicio, fecha_fin, vigencia):
+        error = {'message': 'El semestre ya está agregado.'}
+        return redirect(url_for('listarSemestre', error=error))
+    return redirect(url_for('listarSemestre'))
+
+
+@app.route('/dar_baja_semestre/<int:id>')
+def dar_baja_semestre(id):
+    sem.dar_baja_semestre(id)
+    return redirect(url_for('listarSemestre'))
+
+@app.route('/dar_alta_semestre/<int:id>')
+def dar_alta_semestre(id):
+    sem.dar_alta_semestre(id)
+    return redirect(url_for('listarSemestre'))
+
 
 
 @app.route('/agregar_semestre')
@@ -67,8 +103,7 @@ def guardar_semestre():
     nombre = request.form['nombre']
     fecha_inicio = request.form['fecha_inicio']
     fecha_fin = request.form['fecha_fin']
-    vigencia = request.form['vigencia']
-    if not sem.insertarSemestre(nombre, fecha_inicio, fecha_fin, vigencia):
+    if not sem.insertarSemestre(nombre, fecha_inicio, fecha_fin):
         flash("El semestre ya está agregado.", "danger")  # Agrega un mensaje con categoría 'error'
         return redirect(url_for('agregarSemestre'))
     return redirect(url_for('listarSemestre'))
@@ -143,6 +178,22 @@ def update_docente():
     docentes[index]['hora_disponible'] = request.form['hora_disponible']
     return redirect(url_for('upload_and_display'))
 
+@app.route('/insertar_docente_v1', methods=['POST'])
+def insertar_docenteV1():
+    try:
+        semestre = request.form.get('semestre')
+        nombre = request.form.get('nombre')
+        correo = request.form.get('correo')
+        dedicacion = request.form.get('dedicacion')
+        telefono = request.form.get('telefono')
+        hora_disponible = request.form.get('hora_disponible')
+        if doc.insertarDocente(semestre, nombre, correo, dedicacion, telefono, hora_disponible):
+            flash('Docente insertado exitosamente.', 'success')
+        else:
+            flash('Error al insertar docente', 'danger')
+    except Exception as e:
+        flash(f'Error al insertar docente: {str(e)}', 'danger')
+    return redirect(url_for('upload_and_display'))
 
 # insertar docente en la base de datos desde la tabla
 @app.route('/insertar_docente', methods=['POST'])
@@ -155,7 +206,7 @@ def insertar_docente():
         telefono = request.form.getlist('telefono[]')
         horas_asesoria = request.form.getlist('hora_disponible[]')
 
-        for i in range(len(nombre)):  # Asumimos que todas las listas tienen la misma longitud
+        for i in range(len(nombre)):
             doc.insertarDocente(semestre[i], nombre[i], correo[i], dedicacion[i], telefono[i], horas_asesoria[i])
         global docentes
         docentes = []
@@ -164,6 +215,10 @@ def insertar_docente():
         flash(f'Error al insertar docentes: {str(e)}', 'danger')
     return redirect(url_for('upload_and_display'))
 
+@app.route('/listar_docentes')
+def listarDocente():
+    docentes = doc.listar()
+    return render_template('docente/listar_docente.html', docentes = docentes)
 
 # @app.route('/insertar_docentes', methods=['POST'])
 # def insertar_docentes():
@@ -250,7 +305,6 @@ def agregar_grupo_curso():
 
     return redirect(url_for('listarGrupo'))
     
-    
 # listar grupos
 @app.route('/listar_grupos')
 def listarGrupo():
@@ -262,23 +316,32 @@ def listarGrupoXID(id):
     grupo = gru.listar_grupo_docenteXSEM(id)
     return render_template('grupo_cursos/listar_grupo.html', grupo = grupo)
 
+    
+@app.route('/editar_grupo/<int:id>', methods=['POST'])
+def editarGrupo(id):
+    denominacion = request.form['denominacion']
+    cur.editarCursos(denominacion,id)
+    return redirect(url_for('listarGrupo'))
 
+
+from flask import request, redirect, url_for
 
 @app.route('/insertar_sustentacion_grupo', methods=['POST'])
 def insertar_sustentacion_grupo():
-    # semestre = request.form['semestre']
-    # curso = request.form['curso']
-    tipo_sustentacion = request.form['tiempo']
-    semanas = request.form['weekNumbers']
-    inicio = request.form['startDate']
-    fin = request.form['endDate']
-    duracion = request.form['minutos']
-    # compensacion = request.form['compensa']
-    id_grupo = request.form['id_grupo']
+    tipo_sustentacion = request.form.get('tiempo')
+    semanas = request.form.get('weekNumbers')
+    inicio = request.form.get('startDate')
+    fin = request.form.get('endDate')
+    duracion = request.form.get('duracion') 
+    id_grupo = request.form.get('id_grupo')
     com = 1 if 'compensa' in request.form else 0
+
+    if None in [tipo_sustentacion, semanas, inicio, fin, duracion, id_grupo]:
+        return "Error: Todos los campos son necesarios.", 400
+
     sus.agregarSustentacion(tipo_sustentacion, semanas, inicio, fin, duracion, com, id_grupo)
-    # print(id_grupo, tipo_sustentacion, semanas, inicio, fin, duracion, com)
     return redirect(url_for('sustentacionesGrupo'))
+
 
 
 
@@ -333,14 +396,23 @@ def agregar_estudiantes_proyecto(id):
     email = request.form.getlist('email[]')
     telefono = request.form.getlist('telefono[]')
     asesor = request.form.getlist('asesor[]')
-    
     titulo = request.form.getlist('titulo_tesis[]')
+    exitos = []
+    fallos = []
+    print(codigo, nombres, email, telefono, asesor, titulo, id)
     for i in range(len(nombres)):
         if sus.agregarDocenteSustentacion_proyecto(codigo[i], nombres[i], email[i], telefono[i], asesor[i], id, titulo[i]):
-            flash('Estudiantes agregados exitosamente.', 'success')
+            exitos.append(nombres[i])
         else:
-            flash('Error al agregar el estudiante.', 'danger')
+            fallos.append(nombres[i])
+
+    if exitos:
+        flash(f'Estudiantes agregados exitosamente: {", ".join(exitos)}.', 'success')
+    if fallos:
+        flash(f'Error al agregar los siguientes estudiantes: {", ".join(fallos)}.', 'danger')
+
     return redirect(url_for('sustentacionesGrupo'))
+
                             
 
 @app.route('/sustentacion/disc/agregar_usuario/<int:id>', methods=['POST'])
@@ -375,6 +447,9 @@ def ver_cursos_asignados_docentes(id):
 def inicio_sesion():
     correo = request.form['correo']
     contrasena = request.form['contrasena']
+    if correo == 'admin' and contrasena == '123':
+        user = logi.log_admin(correo, contrasena)
+        return render_template('principal.html', user=user)
     usuario = logi.login(correo, contrasena)
     
     if usuario is None:
@@ -433,6 +508,17 @@ def agregar_disponibilidad_horaria_docente():
     else:
         flash('Método no permitido para esta ruta.', 'danger')
         return redirect(url_for('ver_cursos_asignados_docentes', id=ids_docentes[0] if ids_docentes else 0))
+
+
+# @app.router('/ver_disponibilidad/<int:id>')
+# def ver_disponibilidad(id):
+#     disponibilidad = cur_asig.ver_disponibilidad_docente(id)
+#     return render_template('info_docentes/disponibilidad_docente.html', disponibilidad=disponibilidad)
+
+# @app.route('/horario_docente/<int:id_docente>', methods=['GET'])
+# def ver_horario_docente(id_docente):
+#     resultados = cur_asig.obtener_horario_docente(id_docente)  
+#     return jsonify(resultados)
 
 
 

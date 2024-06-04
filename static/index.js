@@ -5,11 +5,13 @@ $(document).ready(function() {
         } else {
             $('.actions-row').remove();
             var semestreId = $(this).data('id');
-            var actionsRow = '<tr class="actions-row"><td colspan="6">' +
-                '<a href="/editar_semestre/' + semestreId + '" class="btn btn-warning">Editar</a> ' +
+            var actionsRow = '<tr class="actions-row text-center "><td colspan="6">' +
+                '<a href="/editar_semestre/' + semestreId + '" class="btn btn-secondary">Editar</a> ' +
                 '<a href="/eliminar_semestre/' + semestreId + '" class="btn btn-danger">Eliminar</a> ' +
-                '<a href="/agregar_grupos/' + semestreId + '" class="btn btn-info">Agregar Cursos</a> ' +
-                '<a href="/listar_gruposXID/' + semestreId + '" class="btn btn-primary">VER Cursos</a>' +
+                '<a href="/agregar_grupos/' + semestreId + '" class="btn btn-info">Agregar Grupo</a> ' +
+                '<a href="/listar_gruposXID/' + semestreId + '" class="btn btn-primary">Ver Grupos</a> ' +
+                '<a href="/dar_baja_semestre/' + semestreId + '" class="btn btn-warning">Dar baja</a> ' +
+                '<a href="/dar_alta_semestre/' + semestreId + '" class="btn btn-success">Dar alta</a> ' +
                 '</td></tr>';
             $(this).after(actionsRow);
         }
@@ -47,4 +49,15 @@ function formatDate(date) {
     if (day.length < 2) day = '0' + day;
 
     return [year, month, day].join('-');
+}
+
+function ajustarDuracion(index) {
+    var tipoSustentacion = document.getElementById('tipoSustentacion-' + index).value;
+    var campoDuracion = document.getElementById('minutos-' + index);
+    
+    if (tipoSustentacion === 'parcial') {
+        campoDuracion.value = 30;  
+    } else if (tipoSustentacion === 'final') {
+        campoDuracion.value = 60;
+    }
 }

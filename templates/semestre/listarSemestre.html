@@ -8,7 +8,7 @@
 
     <a href="/agregar_semestre" class="btn btn-primary">AGREGAR</a>
 
-    {% with messages = get_flashed_messages(with_categories=true) %}
+    <!-- {% with messages = get_flashed_messages(with_categories=true) %}
     {% if messages %}
     {% for category, message in messages %}
     <div class="alert alert-danger" role="alert">
@@ -16,7 +16,7 @@
     </div>
     {% endfor %}
     {% endif %}
-    {% endwith %}
+    {% endwith %} -->
 
 
     <div class="row">
@@ -42,7 +42,7 @@
                         <td>{{ semestre.nom_semestre }}</td>
                         <td>{{ semestre.fecha_inicio }}</td>
                         <td>{{ semestre.fecha_fin }}</td>
-                        
+
                         {% if semestre.vigencia == 1 %}
                         <td>Activo</td>
                         {% else %}
@@ -59,5 +59,35 @@
     </div>
 
 </div>
+
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+{% if messages %}
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        {% for category, message in messages %}
+        Swal.fire({
+            title: '{{ category|capitalize }}',
+            text: '{{ message }}',
+            icon: '{{ category }}',
+            showClass: {
+                popup: 'animate__animated animate__fadeInDown'
+            },
+            hideClass: {
+                popup: 'swal2-hide'
+            },
+            timer: 3000,
+            timerProgressBar: true,
+            didOpen: () => {
+                const audio = new Audio('../static/audio/notification.mp3');
+                audio.play();
+            }
+        });
+        {% endfor %}
+    });
+</script>
+{% endif %}
+{% endwith %}
+
 
 {% endblock %}

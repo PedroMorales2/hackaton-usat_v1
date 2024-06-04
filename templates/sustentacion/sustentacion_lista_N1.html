@@ -3,82 +3,162 @@
 {% block title %}Editar Semestre{% endblock %}
 
 {% block bloque %}
+<style>
+    /* Estilos Generales */
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #f4f4f4;
+        color: #333;
+    }
 
-<!-- listar sustentacion -->
+    .container {
+        background: #fff;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        margin-top: 20px;
+        padding: 20px;
+        border-radius: 8px;
+    }
 
-{% with messages = get_flashed_messages(with_categories=true) %}
-{% if messages %}
-{% for category, message in messages %}
-<div class="alert alert-{{ category }}">{{ message }}</div>
-{% endfor %}
-{% endif %}
-{% endwith %}
+    /* Estilos de la Tabla */
+    .table {
+        width: 100%;
+        margin-top: 20px;
+        border-collapse: separate;
+        border-spacing: 0 15px;
+    }
 
+    .table th {
+        background-color: #0056b3;
+        color: white;
+        padding: 10px 15px;
+        text-align: left;
+    }
+
+    .table td {
+        background-color: #fff;
+        padding: 10px 15px;
+        border-bottom: solid 2px #f0f0f0;
+        font-size: 16px;
+    }
+
+    /* Mejorar la visibilidad de los encabezados de columna */
+    th:first-child {
+        border-top-left-radius: 10px;
+        border-bottom-left-radius: 10px;
+    }
+
+    th:last-child {
+        border-top-right-radius: 10px;
+        border-bottom-right-radius: 10px;
+    }
+
+    /* Botones */
+    .btn-primary {
+        background-color: #007bff;
+        color: white;
+        border: none;
+        padding: 8px 16px;
+        font-size: 14px;
+        border-radius: 4px;
+        transition: background 0.3s, transform 0.2s;
+    }
+
+    .btn-primary:hover {
+        background-color: #0056b3;
+        transform: scale(1.05);
+    }
+
+    .alert {
+        padding: 10px;
+        margin-top: 20px;
+        border-radius: 4px;
+        color: #fff;
+        font-size: 14px;
+    }
+
+    .alert-danger {
+        background-color: #dc3545;
+    }
+
+    .alert-success {
+        background-color: #28a745;
+    }
+</style>
 
 <div class="container">
+    <h2 class="page-title">Agregar Estudiantes</h2>
+
+    <!-- {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    {% for category, message in messages %}
+    <div class="alert alert-{{ category }}">{{ message }}</div>
+    {% endfor %}
+    {% endif %}
+    {% endwith %} -->
 
     <div class="row">
-
         <div class="col-12">
-
             <table class="table">
-
                 <thead>
-
                     <tr>
-
                         <th>Semestre</th>
-
                         <th>Curso</th>
-
                         <th>Tipo Sustentacion</th>
-
                         <th>Semanas</th>
-
                         <th>Desde</th>
                         <th>Hasta</th>
                         <th>Duracion de cada sustentacion</th>
-                        <th>¿ Compensara ?</th>
+                        <th>¿Compensará?</th>
                         <th>Agregar Estudiantes</th>
                     </tr>
-
                 </thead>
-
                 <tbody>
-
                     {% for sustentacion in sustentaciones %}
                     <tr data-id="{{ sustentacion.idSustentacion }}">
                         <td>{{ sustentacion.nom_semestre }}</td>
-
                         <td>{{ sustentacion.nombre_curso }} - {{ sustentacion.denominacion }}</td>
-
                         <td>{{ sustentacion.tipo_sustentacion }}</td>
-
                         <td>{{ sustentacion.semanas }}</td>
-
                         <td>{{ sustentacion.fecha_inicio }}</td>
-
                         <td>{{ sustentacion.fecha_fin }}</td>
-
                         <td>{{ sustentacion.duracion_maxima }}</td>
-
                         <td>{{ sustentacion.compensacion }}</td>
-
                         <td><a href="/sustentacion/usuarios/{{ sustentacion.idSustentacion }}"
                                 class="btn btn-primary">Agregar Estudiantes</a></td>
-                        <!-- <td><a href="/sustentacion/usuarios" class="btn btn-primary">Agregar Estudiantes</a></td> -->
-
                     </tr>
-
                     {% endfor %}
-
                 </tbody>
-
             </table>
-
         </div>
-
     </div>
 </div>
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+{% if messages %}
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        {% for category, message in messages %}
+        Swal.fire({
+            title: '{{ category|capitalize }}',
+            text: '{{ message }}',
+            icon: '{{ category }}',
+            showClass: {
+                popup: 'animate__animated animate__fadeInDown'
+            },
+            hideClass: {
+                popup: 'swal2-hide'
+            },
+            timerProgressBar: true,
+            didOpen: () => {
+                const audio = new Audio('../static/audio/notification.mp3');
+                audio.play();
+            }
+        });
+        {% endfor %}
+    });
+</script>
+{% endif %}
+{% endwith %}
+
 
 {% endblock %}

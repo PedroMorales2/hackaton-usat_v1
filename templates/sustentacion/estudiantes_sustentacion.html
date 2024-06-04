@@ -3,128 +3,196 @@
 {% block title %}Editar Semestre{% endblock %}
 
 {% block bloque %}
+<style>
+    /* Estilo base para el botón */
+    .btn-success {
+        background-color: #28a745;
+        /* Verde Bootstrap para botones success */
+        border: none;
+        /* Elimina el borde */
+        color: white;
+        /* Texto blanco */
+        padding: 10px 20px;
+        /* Padding para hacer el botón más grande y fácil de clicar */
+        font-size: 16px;
+        /* Tamaño de letra adecuado */
+        border-radius: 5px;
+        /* Bordes redondeados */
+        cursor: pointer;
+        /* Cursor tipo pointer para indicar que es clickeable */
+        transition: all 0.3s ease;
+        /* Transición suave para los efectos */
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        /* Sombra sutil para dar profundidad */
+        outline: none;
+        /* Elimina el outline al hacer foco */
+    }
 
+    /* Efecto al pasar el ratón por encima */
+    .btn-success:hover {
+        background-color: #218838;
+        /* Un verde un poco más oscuro al hacer hover */
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        /* Sombra más pronunciada para efecto 3D */
+        transform: translateY(-2px);
+        /* Mueve ligeramente el botón hacia arriba */
+    }
+
+    /* Efecto al hacer clic en el botón */
+    .btn-success:active {
+        background-color: #1e7e34;
+        /* Un verde más oscuro al hacer clic */
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+        /* Sombra más baja para simular presión */
+        transform: translateY(1px);
+        /* Mueve el botón hacia abajo para simular el clic */
+    }
+
+    /* Efecto al tener el foco, útil para accesibilidad */
+    .btn-success:focus {
+        box-shadow: 0 0 0 3px rgba(40, 167, 69, 0.5);
+        /* Resplandor exterior para indicar foco */
+    }
+</style>
 <div>
-    
-    <div class="row">
-        <div class="col-sm-6 mb-3 mb-sm-0">
-            <div class="card">
-                <div class="card-body">
-                    <h5 class="card-title">Ciclo : {{ sus.nom_semestre }}</h5>
-                    <p class="card-text">Curso: {{ sus.nombre_curso }}</p>
-                    <p class="card-text">Grupo: {{ sus.denominacion }}</p>
-                    <p class="card-text">Tipo Sustentacion: {{ sus.tipo_sustentacion }}</p>
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-6 mb-3 mb-sm-0">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Ciclo : {{ sus.nom_semestre }}</h5>
+                        <p class="card-text">Curso: {{ sus.nombre_curso }}</p>
+                        <p class="card-text">Grupo: {{ sus.denominacion }}</p>
+                        <p class="card-text">Tipo Sustentacion: {{ sus.tipo_sustentacion }}</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-6">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Nombre del docente: {{ sus.nombre_docente }} </h5>
+                        <p class="card-text">Correo: {{ sus.correo }}</p>
+                        <p class="card-text">Telefono: {{ sus.telefono }}</p>
+                        <p class="card-text">Tipo Docente: {{ sus.dedicacion }}</p>
+                    </div>
                 </div>
             </div>
         </div>
-        <div class="col-sm-6">
-            <div class="card">
-                <div class="card-body">
-                    <h5 class="card-title">Nombre del docente: {{ sus.nombre_docente }} </h5>
-                    <p class="card-text">Correo: {{ sus.correo }}</p>
-                    <p class="card-text">Telefono: {{ sus.telefono }}</p>
-                    <p class="card-text">Tipo Docente: {{ sus.dedicacion }}</p>
-                </div>
+
+        <br>
+        <hr>
+
+        <form class="was-validated" method="post" action="/gestion_estudiantes/{{ sus.idSustentacion }}"
+            enctype="multipart/form-data">
+            <div class="mb-3">
+                <h5 class="card-title">Subir archivo XML de Estudiantes</h5>
             </div>
-        </div>
+            <div class="mb-3">
+                <input type="file" class="form-control" name="file" accept=".xml, .xlsx, .csv" required>
+            </div>
+
+            <div class="mb-3">
+                <button class="btn btn-primary" type="submit">Listar</button>
+            </div>
+        </form>
+
+        {% if sus.idCurso==1 %}
+        <form action="/sustentacion/proyecto/agregar_usuario/{{ sus.idSustentacion }}" method="post">
+            <div class="table p-2">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Semestre</th>
+                            <th>Código Universitario</th>
+                            <th>Apellidos y Nombres</th>
+                            <th>Email</th>
+                            <th>Telefono</th>
+                            <!-- <th>Jurado 1</th>
+                            <th>Jurado 2</th> -->
+                            <th>Asesor (Jurado 3)</th>
+                            <th>Título de Tesis</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for index in estudiantes %}
+                        <tr>
+                            <td><input type="text" class="input_para_ubicar" name="semestre[]"
+                                    value="{{ estudiantes[index]['Semestre'] }}" readonly></td>
+                            <td><input type="text" class="input_para_ubicar" name="codigo_universitario[]"
+                                    value="{{ estudiantes[index]['Codigo Universitario'] }}" readonly></td>
+                            <td><input type="text" class="input_para_ubicar" name="apellidos_nombres[]"
+                                    value="{{ estudiantes[index]['Apellidos y Nombres'] }}" readonly></td>
+                            <td><input type="text" class="input_para_ubicar" name="email[]"
+                                    value="{{ estudiantes[index]['Email'] }}" readonly></td>
+                            <td><input type="text" class="input_para_ubicar" name="telefono[]"
+                                    value="{{ estudiantes[index]['Telefono'] }}" readonly></td>
+                            <!-- <td><input type="text" class="input_para_ubicar" name="jurado_1[]" value="{{ estudiantes[index]['Jurado 1'] }}"></td> -->
+                            <!-- <td><input type="text" class="input_para_ubicar" name="jurado_2[]" value="{{ estudiantes[index]['Jurado 2'] }}"></td> -->
+                            <td><input type="text" class="input_para_ubicar" name="asesor[]"
+                                    value="{{ estudiantes[index]['Asesor'] }}" readonly></td>
+                            <td><input type="text" class="input_para_ubicar" name="titulo_tesis[]"
+                                    value="{{ estudiantes[index]['Título de Tesis'] }}" readonly></td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <div class="mb-3">
+                <button class="btn btn-success" type="submit">Agregar</button>
+            </div>
+        </form>
+
+        {% else %}
+        <form action="/sustentacion/disc/agregar_usuario/{{ sus.idSustentacion }}" method="post">
+            <div class="table-responsive p-3">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Semestre</th>
+                            <th>Código Universitario</th>
+                            <th>Apellidos y Nombres</th>
+                            <th>Email</th>
+                            <th>Telefono</th>
+                            <th>Jurado 1</th>
+                            <th>Jurado 2</th>
+                            <th>Asesor (Jurado 3)</th>
+                            <th>Título de Tesis</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for index in estudiantes %}
+                        <tr>
+                            <td><input type="text" class="input_para_ubicar" name="semestre[]"
+                                    value="{{ estudiantes[index]['Semestre'] }}" readonly></td>
+                            <td><input type="text" class="input_para_ubicar" name="codigo_universitario[]"
+                                    value="{{ estudiantes[index]['Codigo Universitario'] }}" readonly></td>
+                            <td><input type="text" class="input_para_ubicar" name="apellidos_nombres[]"
+                                    value="{{ estudiantes[index]['Apellidos y Nombres'] }}" readonly></td>
+                            <td><input type="text" class="input_para_ubicar" name="email[]"
+                                    value="{{ estudiantes[index]['Email'] }}" readonly></td>
+                            <td><input type="text" class="input_para_ubicar" name="telefono[]"
+                                    value="{{ estudiantes[index]['Telefono'] }}" readonly></td>
+                            <td><input type="text" class="input_para_ubicar" name="jurado_1[]"
+                                    value="{{ estudiantes[index]['Jurado 1'] }}" readonly></td>
+                            <td><input type="text" class="input_para_ubicar" name="jurado_2[]"
+                                    value="{{ estudiantes[index]['Jurado 2'] }}" readonly></td>
+                            <td><input type="text" class="input_para_ubicar" name="asesor[]"
+                                    value="{{ estudiantes[index]['Asesor'] }}" readonly></td>
+                            <td><input type="text" class="input_para_ubicar" name="titulo_tesis[]"
+                                    value="{{ estudiantes[index]['Título de Tesis'] }}" readonly></td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <div class="mb-3">
+                <button class="btn btn-success" type="submit">Insertar</button>
+            </div>
+        </form>
+
+
+        {% endif %}
     </div>
-
-    <br>
-    <hr>
-
-    <form class="was-validated" method="post" action="/gestion_estudiantes/{{ sus.idSustentacion }}"
-        enctype="multipart/form-data">
-        <div class="mb-3">
-            <h5 class="card-title">Subir archivo XML de Estudiantes</h5>
-        </div>
-        <div class="mb-3">
-            <input type="file" class="form-control" name="file" accept=".xml, .xlsx, .csv" required>
-        </div>
-
-        <div class="mb-3">
-            <button class="btn btn-primary" type="submit">Submit form</button>
-        </div>
-    </form>
-
-    <br>
-    <hr>
-    <br>
-    {% if sus.idCurso==1 %}
-    <form action="/sustentacion/proyecto/agregar_usuario/{{ sus.idSustentacion }}" method="post">
-        <div class="table p-3">
-            <table>
-                <thead>
-                    <tr>
-                        <th>Semestre</th>
-                        <th>Código Universitario</th>
-                        <th>Apellidos y Nombres</th>
-                        <th>Email</th>
-                        <th>Telefono</th>
-                        <!-- <th>Jurado 1</th>
-                        <th>Jurado 2</th> -->
-                        <th>Asesor (Jurado 3)</th>
-                        <th>Título de Tesis</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for index in estudiantes %}
-                    <tr>
-                        <td><input type="text" class="input_para_ubicar" name="semestre[]" value="{{ estudiantes[index]['Semestre'] }}"></td>
-                        <td><input type="text" class="input_para_ubicar" name="codigo_universitario[]" value="{{ estudiantes[index]['Codigo Universitario'] }}"></td>
-                        <td><input type="text" class="input_para_ubicar" name="apellidos_nombres[]" value="{{ estudiantes[index]['Apellidos y Nombres'] }}"></td>
-                        <td><input type="text" class="input_para_ubicar" name="email[]" value="{{ estudiantes[index]['Email'] }}"></td>
-                        <td><input type="text" class="input_para_ubicar" name="telefono[]" value="{{ estudiantes[index]['Telefono'] }}"></td>
-                        <!-- <td><input type="text" class="input_para_ubicar" name="jurado_1[]" value="{{ estudiantes[index]['Jurado 1'] }}"></td> -->
-                        <!-- <td><input type="text" class="input_para_ubicar" name="jurado_2[]" value="{{ estudiantes[index]['Jurado 2'] }}"></td> -->
-                        <td><input type="text" class="input_para_ubicar" name="asesor[]" value="{{ estudiantes[index]['Asesor'] }}"></td>
-                        <td><input type="text" class="input_para_ubicar" name="titulo_tesis[]" value="{{ estudiantes[index]['Título de Tesis'] }}"></td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-        <button type="submit">agregar</button>
-    </form>
-
-    {% else %}
-    <form action="/sustentacion/disc/agregar_usuario/{{ sus.idSustentacion }}" method="post">
-        <div class="table-responsive p-3">
-            <table class="table table-hover">
-                <thead>
-                    <tr>
-                        <th>Semestre</th>
-                        <th>Código Universitario</th>
-                        <th>Apellidos y Nombres</th>
-                        <th>Email</th>
-                        <th>Telefono</th>
-                        <th>Jurado 1</th>
-                        <th>Jurado 2</th>
-                        <th>Asesor (Jurado 3)</th>
-                        <th>Título de Tesis</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for index in estudiantes %}
-                    <tr>
-                        <td><input type="text" class="input_para_ubicar" name="semestre[]" value="{{ estudiantes[index]['Semestre'] }}"></td>
-                        <td><input type="text" class="input_para_ubicar" name="codigo_universitario[]" value="{{ estudiantes[index]['Codigo Universitario'] }}"></td>
-                        <td><input type="text" class="input_para_ubicar" name="apellidos_nombres[]" value="{{ estudiantes[index]['Apellidos y Nombres'] }}"></td>
-                        <td><input type="text" class="input_para_ubicar" name="email[]" value="{{ estudiantes[index]['Email'] }}"></td>
-                        <td><input type="text" class="input_para_ubicar" name="telefono[]" value="{{ estudiantes[index]['Telefono'] }}"></td>
-                        <td><input type="text" class="input_para_ubicar" name="jurado_1[]" value="{{ estudiantes[index]['Jurado 1'] }}"></td>
-                        <td><input type="text" class="input_para_ubicar" name="jurado_2[]" value="{{ estudiantes[index]['Jurado 2'] }}"></td>
-                        <td><input type="text" class="input_para_ubicar" name="asesor[]" value="{{ estudiantes[index]['Asesor'] }}"></td>
-                        <td><input type="text" class="input_para_ubicar" name="titulo_tesis[]" value="{{ estudiantes[index]['Título de Tesis'] }}"></td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-        <button type="submit">agregar</button>
-    </form>
-
-
-    {% endif %}
 </div>
 
 {% endblock %}

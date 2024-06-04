@@ -7,31 +7,32 @@
 
 <div>
     <h1 class="text-center">Editar Semestre</h1>
-    {% with messages = get_flashed_messages(with_categories=true) %}
+    <!-- {% with messages = get_flashed_messages(with_categories=true) %}
     {% if messages %}
         {% for category, message in messages %}
             <div class="alert alert-{{ category }}">{{ message }}</div>
         {% endfor %}
     {% endif %}
-    {% endwith %}
+    {% endwith %} -->
     <a href="/semestres" class="btn btn-primary">Regresar</a>
     <hr>
     <br>
     
     {% if semestre %}
 
-    <form action="/actualizar_semestre/{{ semestre.id_semestre }}" method="post">
+    <form action="/actualizar_semestre" method="post">
+        <input type="text" value="{{semestre.id_semestre}}" name="id_semestre" hidden>
         <div class="mb-3">
             <label for="nombre" class="form-label">Nombre</label>
-            <input type="text" class="form-control" id="nombre" name="nombre" value="{{ semestre.nom_semestre }}">
+            <input type="text" class="form-control" id="nombre" name="nombre" value="{{ semestre.nom_semestre }}" disabled>
         </div>
         <div class="mb-3">
             <label for="fecha_inicio" class="form-label">Fecha Inicio</label>
-            <input type="date" class="form-control" id="fecha_inicio" name="fecha_inicio" value="{{ semestre.fecha_inicio }}">
+            <input type="date" class="form-control" id="fecha_inicio" name="fecha_inicio" value="{{ semestre.fecha_inicio }}" required>
         </div>
         <div class="mb-3">
             <label for="fecha_fin" class="form-label">Fecha Fin</label>
-            <input type="date" class="form-control" id="fecha_fin" name="fecha_fin" value="{{ semestre.fecha_fin }}">
+            <input type="date" class="form-control" id="fecha_fin" name="fecha_fin" value="{{ semestre.fecha_fin }}" required>
         </div>
         <div class="mb-3">
             <label for="vigencia" class="form-label">Vigencia</label>
@@ -46,5 +47,35 @@
     {% endif %}
 
 </div>
+
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+{% if messages %}
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        {% for category, message in messages %}
+        Swal.fire({
+            title: '{{ category|capitalize }}',
+            text: '{{ message }}',
+            icon: '{{ category }}',
+            showClass: {
+                popup: 'animate__animated animate__fadeInDown'
+            },
+            hideClass: {
+                popup: 'swal2-hide'
+            },
+            timer: 3000,
+            timerProgressBar: true,
+            didOpen: () => {
+                const audio = new Audio('../static/audio/notification.mp3');
+                audio.play();
+            }
+        });
+        {% endfor %}
+    });
+</script>
+{% endif %}
+{% endwith %}
+
 
 {% endblock %}

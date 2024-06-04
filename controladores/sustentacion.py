@@ -40,20 +40,24 @@ def agregarSustentacion(tipo_sustentacion, semana, fecha_inicio, fecha_fin, dura
         return False
     finally:
         cursor.close()
-        
-def agregarDocenteSustentacion_proyecto(codigo,nombreAlumno,email,telefono,asesor,id_sustentacion,proyecto):
+
+
+def agregarDocenteSustentacion_proyecto(codigo, nombreAlumno, email, telefono, asesor, id_sustentacion, proyecto):
     con = conexion()
     try:
-        with con.cursor() as cursor:
-            cursor.callproc('insertar_alumno_v', (codigo,nombreAlumno,email,telefono,asesor,id_sustentacion,proyecto))
-            con.commit()
-            return True
+        cursor = con.cursor()  # Crea el cursor
+        cursor.callproc('InsertarSustentacionYJurados', (asesor, nombreAlumno, email, telefono, proyecto, id_sustentacion, codigo))
+        con.commit()
+        return True
     except Exception as e:
         print("Error al insertar alumno sustentacion:", e)
         con.rollback()
         return False
     finally:
-        cursor.close()
+        if cursor:  # Asegúrate de que el cursor se cierra solo si fue creado exitosamente
+            cursor.close()
+        con.close()  # Asegúrate de cerrar la conexión también
+
 
 def agregarDocenteSustentacion_disc(codigo,nombreAlumno,email,telefono,jurado1,jurado2,asesor,id_sustentacion,proyecto):
     con = conexion()

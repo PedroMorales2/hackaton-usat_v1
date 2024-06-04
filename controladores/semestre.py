@@ -13,17 +13,27 @@ def listar():
             cursor.close()
             
             
-def insertarSemestre(nombre, fecha_inicio, fecha_fin, vigencia):
-    con = conexion()  
+def insertarSemestre(nombre, fecha_inicio, fecha_fin):
+    con = conexion()
+    try:
+        with con.cursor() as cursor:
+            # Comprobar si el semestre ya existe
+            cursor.execute('SELECT 1 FROM semestre_academico WHERE nom_semestre = %s', (nombre,))
+            if cursor.fetchone():
+                return False  # El semestre ya existe
 
-    with con.cursor() as cursor:
-        cursor.execute('SELECT * FROM semestre_academico WHERE nom_semestre = %s', (nombre,))
-        if cursor.fetchone() is not None:
-            return False 
-        cursor.execute('INSERT INTO semestre_academico (nom_semestre, fecha_inicio, fecha_fin, vigencia) VALUES (%s, %s, %s, %s)', 
-                       (nombre, fecha_inicio, fecha_fin, vigencia))
-        con.commit()
-        return True
+            # Insertar nuevo semestre con vigencia por defecto activada (1)
+            cursor.execute(
+                'INSERT INTO semestre_academico (nom_semestre, fecha_inicio, fecha_fin, vigencia) VALUES (%s, %s, %s, 1)',
+                (nombre, fecha_inicio, fecha_fin)
+            )
+            con.commit()
+            return True
+    except Exception as e:
+        print(f"Error al insertar el semestre: {e}")
+        return False
+    finally:
+        con.close()
 
 def eliminarSemestre(id):
     con = conexion()
@@ -31,16 +41,12 @@ def eliminarSemestre(id):
         cursor.execute('DELETE FROM semestre_academico WHERE id_semestre = %s', (id))
         con.commit()
         
-def editarSemestre(id, nombre, fecha_inicio, fecha_fin, vigencia):
-    
+def editarSemestre(id, fecha_inicio, fecha_fin, vigencia):
     con = conexion()  
     try:
         with con.cursor() as cursor:
-            cursor.execute('SELECT * FROM semestre_academico WHERE nom_semestre = %s', (nombre,))
-            if cursor.fetchone() is not None:
-                return False 
-            cursor.execute('UPDATE semestre_academico SET nom_semestre = %s, fecha_inicio = %s, fecha_fin = %s, vigencia = %s WHERE id_semestre = %s', (nombre, fecha_inicio, fecha_fin, vigencia, id))
-            cursor.commit()
+            cursor.execute('UPDATE semestre_academico SET fecha_inicio = %s, fecha_fin = %s, vigencia = %s WHERE id_semestre = %s', ( fecha_inicio, fecha_fin, vigencia, id))
+            con.commit()
             return True
     except Exception as e:
         print("Error al actualizar semestre:", e)
@@ -61,4 +67,18 @@ def buscarSemestrePorNombre(nombre):
         cursor.execute('SELECT * FROM semestre_academico WHERE nombre = %s', (nombre))
         return cursor.fetchone()
     
+
+def dar_baja_semestre(id):
+    con = conexion()
+    with con.cursor() as cursor:
+        cursor.execute('UPDATE `semestre_academico` SET `vigencia`=0 WHERE  `id_semestre` = %s', (id))
+        con.commit()
+        return True
+    
+def dar_alta_semestre(id):
+    con = conexion()
+    with con.cursor() as cursor:
+        cursor.execute('UPDATE `semestre_academico` SET `vigencia`=1 WHERE  `id_semestre` = %s', (id))
+        con.commit()
+        return True
 

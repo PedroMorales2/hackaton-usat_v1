@@ -40,3 +40,4 @@ def listar_grupo_docenteXSEM(id_semestre):
         return []
     finally:
         cursor.close()
+        

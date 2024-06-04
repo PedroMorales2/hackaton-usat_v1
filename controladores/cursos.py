@@ -59,4 +59,20 @@ def eliminarCurso(id):
         print("Error al eliminar curso:", e)
     finally:
         cursor.close()
+        
+def editarCursos(denominacion, id):
+    con = conexion()
+    try:
+        with con.cursor() as cursor:
+            # Corrige la consulta SQL para usar marcadores de posición correctamente
+            sql = "UPDATE `grupos` SET `denominacion`=%s WHERE `idGrupo`=%s"
+            cursor.execute(sql, (denominacion, id))
+            con.commit()
+            return True  # Añade un retorno para confirmar la actualización exitosa
+    except Exception as e:
+        print("Error al actualizar curso:", e)
+        return False  # Retorna False si hay un error
+    finally:
+        con.close()  # Asegúrate de cerrar la conexión
+
 

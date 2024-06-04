@@ -1,5 +1,20 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    color: #333;
+}
+
+.container {
+    background: #fff;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    margin-top: 20px;
+    padding: 20px;
+    border-radius: 8px;
+}
+
+
 .actions-row td {
-    background-color: #f8f9fa; 
+    background-color: #f8f9fa;
 }
 
 .clickable-row {
@@ -7,23 +22,45 @@
 }
 
 .clickable-row:hover {
-    background-color: #b26868; 
+    background-color: #b26868;
 }
 
-#semestre{
+#semestre {
     font-family: Arial, Helvetica, sans-serif;
     color: red;
     text-align: center;
 }
 
-.input_para_ubicar{
-    margin-left: -10px;
-    width: 75%;
+.input_para_ubicar {
+    background: none;        /* Elimina el fondo */
+    border: none;            /* Elimina los bordes */
+    color: #333;             /* Establece el color del texto, ajusta según necesites */
+    font-size: 16px;         /* Tamaño de fuente para mejor legibilidad */
+    font-family: Arial, sans-serif; /* Tipo de fuente, puedes ajustar a lo que prefieras */
+    width: 100%;             /* Asegura que ocupe todo el espacio disponible en su contenedor */
+    padding: 8px 0;          /* Espaciado interno, ajusta según necesites */
 }
 
+.input_para_ubicar:focus {
+    outline: none;           /* Elimina el borde de foco que algunos navegadores añaden */
+    box-shadow: none;        /* Elimina cualquier sombra que pudiera estar activa */
+}
+
+table {
+    width: 100%;             /* Ocupa todo el ancho del contenedor */
+    border-collapse: collapse; /* Asegura que no hay espacios entre celdas */
+}
+
+th, td {
+    padding: 10px;           /* Añade espaciado interno para no sentir los textos apretados */
+    text-align: left;        /* Alineación de texto a la izquierda, ajusta según necesites */
+}
+
+
+
 .navbar {
-    background-color: #0056b3; /* Azul oscuro personalizado */
-    border-bottom: 3px solid #ffc107; /* Barra amarilla para destacar */
+    background-color: #0056b3;
+    border-bottom: 3px solid #ffc107;
 }
 
 .nav-link {
@@ -31,17 +68,17 @@
 }
 
 .nav-link:hover, .nav-link:focus {
-    color: #ffc107; /* Amarillo al pasar el mouse o enfocar */
+    color: #ffc107;
     text-decoration: underline;
 }
 
 .dropdown-menu {
-    border-color: #ffc107; /* Borde del menú desplegable */
+    border-color: #ffc107;
 }
 
 #sidebar-container {
-    width: 250px; /* Adjust the width of the sidebar */
-    min-height: 100vh; /* Full height */
+    width: 250px;
+    min-height: 100vh;
 }
 
 .bg-dark {
@@ -49,5 +86,70 @@
 }
 
 .nav-link {
-    color: #fff!important; /* White text color */
+    color: #fff!important;
+}
+
+.modal-header {
+    background-color: #007bff;
+    color: white;
+}
+
+.modal-content {
+    border-radius: 8px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+}
+
+.form-control, .btn, select {
+    border-radius: 5px;
+    margin-bottom: 15px;  /* Añado espacio debajo de cada campo para evitar que se choquen */
+}
+
+.btn-primary, .btn-secondary {
+    border: none;
+}
+
+.btn-primary:hover, .btn-secondary:hover {
+    opacity: 0.8;
+}
+
+select {
+    display: block;
+    width: 100%;
+    padding: 0.375rem 1.75rem 0.375rem 0.75rem;
+    line-height: 1.5;
+    color: #495057;
+    background-color: #fff;
+    background-clip: padding-box;
+    border: 1px solid #ced4da;
+    appearance: none;
+}
+
+.modal-body {
+    padding: 20px;
+}
+
+
+@keyframes flyAway {
+    0% {
+        opacity: 1;
+        transform: translateX(0);
+    }
+
+    50% {
+        opacity: 0.7;
+        transform: translateX(50px) translateY(-30px) rotate(10deg);
+    }
+
+    100% {
+        opacity: 0;
+        transform: translateX(200px) translateY(-50px) rotate(20deg);
+    }
+}
+
+.swal2-hide {
+    animation: flyAway 1s forwards;
+}
+
+.swal2-popup {
+    border-radius: 8px;
 }

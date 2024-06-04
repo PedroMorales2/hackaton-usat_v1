@@ -4,7 +4,7 @@
 {% block bloque %}
 
 <div class="container mt-5">
-    {% with messages = get_flashed_messages(with_categories=true) %}
+    <!-- {% with messages = get_flashed_messages(with_categories=true) %}
     {% if messages %}
     {% for category, message in messages %}
     <div class="alert alert-{{category}} alert-dismissible fade show" role="alert">
@@ -13,7 +13,39 @@
       </div>
     {% endfor %}
     {% endif %}
+    {% endwith %} -->
+
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            {% for category, message in messages %}
+            Swal.fire({
+                title: '{{ category|capitalize }}',
+                text: '{{ message }}',
+                icon: '{{ category }}',
+                showClass: {
+                    popup: 'animate__animated animate__fadeInDown'
+                },
+                hideClass: {
+                    popup: 'swal2-hide'
+                },
+                timer: 3000,
+                timerProgressBar: true,
+                didOpen: () => {
+                    const audio = new Audio('../static/audio/notification.mp3');
+                    audio.play();
+                }
+            });
+            {% endfor %}
+        });
+    </script>
+    {% endif %}
     {% endwith %}
+
+
+
     <style>
         .stylish-header {
             font-family: 'Arial', sans-serif;
@@ -81,6 +113,10 @@
                 <ul class="navbar-nav ml-auto">
                     {% if cur %}
                     <li class="nav-item active">
+                        <a href="/ver_disponibilidad/{{ cur[0].id_docentes }}"
+                            class="btn btn-success stylish-button">Ver Disponibidad</a>
+                    </li>
+                    <li class="nav-item active">
                         <a href="/listar_asesor_jurado/{{ cur[0].id_docentes }}"
                             class="btn btn-success stylish-button">Ver Asesor Jurado</a>
                     </li>
@@ -140,6 +176,8 @@
             </table>
         </div>
     </div>
+    <a href="" class="btn btn-success">ASIGNAR FECHA DE ASESORIA</a>
+    <a href="" class="btn btn-success">ASIGNAR disponibilidad como jurado</a>
 </div>
 
 <!-- Modal para agregar disponibilidad -->
@@ -197,6 +235,7 @@
     </form>
 </div>
 
+
 <script>
     document.querySelectorAll('.agregar-disponibilidad').forEach(button => {
         button.addEventListener('click', function () {
@@ -216,7 +255,7 @@
 
     document.getElementById('guardarDisponibilidadBtn').addEventListener('click', function () {
 
-        
+
         var modal = $('#modalAgregarDisponibilidad');
         var tbody = document.getElementById('tablaDisponibilidades').getElementsByTagName('tbody')[0];
         var row = tbody.insertRow();
@@ -237,5 +276,8 @@
         $('#modalAgregarDisponibilidad').modal('hide');  // Ocultar modal después de añadir
     });
 </script>
+
+
+
 
 {% endblock %}

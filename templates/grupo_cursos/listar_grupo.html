@@ -4,13 +4,13 @@
 
 {% block bloque %}
 
-{% with messages = get_flashed_messages(with_categories=true) %}
+<!-- {% with messages = get_flashed_messages(with_categories=true) %}
 {% if messages %}
 {% for category, message in messages %}
 <div class="alert alert-{{ category }}">{{ message }}</div>
 {% endfor %}
 {% endif %}
-{% endwith %}
+{% endwith %} -->
 
 
 <div class="container">
@@ -101,7 +101,7 @@
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="editModalLabel-{{ loop.index }}">Editar GRUPO</h5>
+                <h5 class="modal-title" id="editModalLabel-{{ loop.index }}">INSERTAR SUSTENTACION</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
@@ -111,7 +111,8 @@
                     <input type="hidden" name="index" value="{{ loop.index0 }}">
 
 
-                    <input type="text" class="form-control" id="semestre" name="id_grupo" value="{{ grupo.idGrupo }}" hidden>
+                    <input type="text" class="form-control" id="semestre" name="id_grupo" value="{{ grupo.idGrupo }}"
+                        hidden>
 
 
                     <div class="form-group row">
@@ -132,7 +133,8 @@
                     <div class="form-group row">
                         <label for="curso" class="col-sm-2 col-form-label">Tipo Sustentacion</label>
                         <div class="col-sm-10">
-                            <select name="tiempo" id="">
+                            <select name="tiempo" id="tipoSustentacion-{{ loop.index }}"
+                                onchange="ajustarDuracion({{ loop.index }})">
                                 <option value="parcial">PARCIAL</option>
                                 <option value="final">FINAL</option>
                             </select>
@@ -166,14 +168,16 @@
                     <div class="form-group row">
                         <label for="curso" class="col-sm-2 col-form-label">Duracion min</label>
                         <div class="col-sm-10">
-                            <input type="number" class="form-control" id="minutos" name="minutos" required>
+                            <input type="number" class="form-control" id="minutos-{{ loop.index }}" name="duracion"
+                                readonly>
                         </div>
                     </div>
 
                     <div class="form-group row">
-                        <label for="curso" class="col-sm-2 col-form-label">¿Compensara?</label>
+                        <label for="curso" class="col-sm-3 col-form-label">¿Compensara?</label>
                         <div class="col-sm-10 x-2 ">
-                            <input type="checkbox" name="compensa" id="" value="1">
+                            <input type="checkbox" name="compensa" id="compensacion" value="1">
+                            <span id="estadoCompensacion" class="hidden"></span>
                         </div>
                     </div>
 
@@ -202,7 +206,7 @@
                 </button>
             </div>
             <div class="modal-body">
-                <form method="post" action="/actualizar_grupo/{{ grupo.idGrupo}}">
+                <form method="post" action="/editar_grupo/{{ grupo.idGrupo}}">
                     <input type="hidden" name="index" value="{{ loop.index0 }}">
                     <div class="form-group row">
                         <label for="denominacion" class="col-sm-2 col-form-label">Denominacion</label>
@@ -241,5 +245,49 @@
 </div>
 {% endfor %}
 
+{% with messages = get_flashed_messages(with_categories=true) %}
+{% if messages %}
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        {% for category, message in messages %}
+        Swal.fire({
+            title: '{{ category|capitalize }}',
+            text: '{{ message }}',
+            icon: '{{ category }}',
+            showClass: {
+                popup: 'animate__animated animate__fadeInDown'
+            },
+            hideClass: {
+                popup: 'swal2-hide'
+            },
+            timer: 3000,
+            timerProgressBar: true,
+            didOpen: () => {
+                const audio = new Audio('../static/audio/notification.mp3');
+                audio.play();
+            }
+        });
+        {% endfor %}
+    });
+</script>
+{% endif %}
+{% endwith %}
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const checkbox = document.getElementById('compensacion');
+        const estado = document.getElementById('estadoCompensacion');
+
+        checkbox.addEventListener('change', function () {
+            if (this.checked) {
+                estado.textContent = "Sí, está compensado";
+                estado.style.display = "inline";
+            } else {
+                estado.textContent = "No, no está compensado";
+                estado.style.display = "inline";
+            }
+        });
+    });
+</script>
 
 {% endblock %}

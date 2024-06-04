@@ -59,7 +59,7 @@ def listar_asesor_jurado(id):
         query = """
                     SELECT 
 	 cur.nombre_curso,
-  al.codAlumno,
+  al.codigo_universitario,
   doce.id_docentes,
     al.nombre_completo, 
     GROUP_CONCAT(DISTINCT CASE 
@@ -94,3 +94,47 @@ GROUP BY
     finally:
         cursor.close()
         con.close()
+
+
+
+def obtener_horario_docente(id_docente):
+    con = conexion()
+    # with con.cursor() as cursor:
+    #     cursor.execute("""
+    #                 SELECT cur.nombre_curso, hor.fecha, hor.hora_inicio, hor.hora_fin FROM horario_disponible_docente hor 
+    #                 INNER JOIN docentes doc ON hor.id_docentes = doc.id_docentes
+    #                 INNER JOIN sustentacion sus ON sus.idSustentacion = hor.id_sustentacion
+    #                 INNER JOIN grupos gru ON gru.idGrupo = sus.GruposGrupo
+    #                 INNER JOIN curso cur ON cur.idCurso = gru.CursoIdCurso
+    #                 WHERE doc.id_docentes = %s
+    #     """, (id_docente,))
+    #     filas = [x[0] for x in cursor.description]
+    #     for row in cursor.fetchall():
+    #         d.append(dict(zip(filas, row)))
+    #     print(d)
+    #     return d
+    
+    
+    try:
+        cursor = con.cursor()
+        query = """
+                    SELECT cur.nombre_curso, hor.fecha, hor.hora_inicio, hor.hora_fin FROM horario_disponible_docente hor 
+                    INNER JOIN docentes doc ON hor.id_docentes = doc.id_docentes
+                    INNER JOIN sustentacion sus ON sus.idSustentacion = hor.id_sustentacion
+                    INNER JOIN grupos gru ON gru.idGrupo = sus.GruposGrupo
+                    INNER JOIN curso cur ON cur.idCurso = gru.CursoIdCurso
+                    WHERE doc.id_docentes = %s
+        """
+        cursor.execute(query, (id_docente,))
+        resultados = cursor.fetchall()
+        return resultados
+    except Exception as e:
+        print("Error al obtener el horario del docente:", e)
+        return None
+    finally:
+        cursor.close()
+        con.close()
+
+
+# def ver_disponibilidad(id):
+    
